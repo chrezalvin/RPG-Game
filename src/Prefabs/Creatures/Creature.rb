@@ -3,7 +3,7 @@ require_relative "../Damages/BasicDamage"
 require_relative "../Skills/Skill"
 
 class Creature
-    attr_reader :hp, :mp, :atk, :is_dead, :name, :usable_skills
+    attr_reader :hp, :mp, :atk, :name, :usable_skills
 
     @@initial_hp = 100
     @@initial_mp = 100
@@ -14,7 +14,6 @@ class Creature
         @atk = @@initial_atk
         @name = "Unknown Creature"
         @usable_skills = []
-        @is_dead = false
 
         @get_hit_listeners = []
         @use_skill_listeners = []

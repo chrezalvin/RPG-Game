@@ -1,39 +1,30 @@
 #!/usr/bin/env ruby
 
-require "curses"
-require "io/console"
-
-def user_interface(options, selected)
-    for option_idx in 0..(options.length - 1)
-        if selected == option_idx
-            puts("> #{options[option_idx]}")
-        else
-            puts("  #{options[option_idx]}")
-        end
-    end
-
-    puts("\nPress up and down key to select and Enter to confirm")
-end
+require "./src/Game"
+require "./src/UserInterface"
+require "./src/UserInput"
+require "./src/Prefabs/Menu/MainMenu"
+require "./src/Prefabs/Creatures/Enemies/Minotaur"
 
 if __FILE__ == $0
-    print "\e[8;40;80t" # resizes terminal window to 40x80 characters
-
     iii = 0
-    select_idx = 0
-    options = ["test 1", "test 2", "test 3"]
+    game = Game.new()
+    user_interface = UserInterface.new(game)
+    user_input = UserInput.new()
 
-    while iii < 10 do
+    user_input.register_up_listener(lambda {game.current_menu.focus_prev_element if game.current_menu.is_a? Menu})
+    user_input.register_down_listener(lambda {game.current_menu.focus_next_element if game.current_menu.is_a? Menu})
+    user_input.register_enter_listener(lambda {game.current_menu.select_current_element if game.current_menu.is_a? Menu})
+
+    until game.flag_exit == true
         system("clear") || system("cls")
 
-        user_interface(options, select_idx)
-        user_input = STDIN.getch
-
-        if user_input.bytes == [224, 80]
-            select_idx = (select_idx + 1) % 3
-        elsif user_input.bytes == [224, 72]
-            select_idx = (select_idx - 1) % 3
-        end
-
+        user_interface.print()
+        user_input.get_arrow_input()
         iii += 1
-    end
+
+        if iii > 20
+            game.quit_game()
+        end
+    end 
 end
