@@ -23,7 +23,7 @@ if __FILE__ == $0
         user_input.get_arrow_input()
         iii += 1
 
-        if iii > 10
+        if iii > 20
             game.quit_game()
         end
     end 

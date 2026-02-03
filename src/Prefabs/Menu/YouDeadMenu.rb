@@ -8,7 +8,7 @@ class YouDeadMenu < Menu
 
         if game.is_a? Game
             @menu_list = [
-                MenuElement.new("Start a New Game", lambda{game.reset_game}),
+                MenuElement.new("Start a New Game", lambda{game.reset_game.request_choose_player}),
                 MenuElement.new("Back to Main Menu", lambda{game.back_to_main_menu})
             ]
         end
