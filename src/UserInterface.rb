@@ -64,11 +64,14 @@ class UserInterface
 
         if (@game.player != nil) && (@game.enemy) != nil
             print_fill("=")
-            prints_bordered_line("#{@game.player.name}", "center", @box_width/2); prints_bordered_line("#{@game.enemy.name}", "center", @box_width/2); 
+            prints_bordered_line("#{@game.player.name}", "center", @box_width/2); 
+            prints_bordered_line("#{@game.enemy.name}", "center", @box_width/2); 
             printf("\n")
-            prints_bordered_line("HP: #{@game.player.hp}", "left", @box_width / 2); prints_bordered_line("HP: #{@game.enemy.hp}", "left", @box_width / 2)
+            prints_bordered_line("HP: #{@game.player.hp}", "left", @box_width / 2); 
+            prints_bordered_line("HP: #{@game.enemy.hp}", "left", @box_width / 2)
             printf("\n")
-            prints_bordered_line("MP: #{@game.player.mp}", "left", @box_width / 2); prints_bordered_line("MP: #{@game.enemy.mp}", "left", @box_width / 2); 
+            prints_bordered_line("MP: #{@game.player.mp}", "left", @box_width / 2); 
+            prints_bordered_line("MP: #{@game.enemy.mp}", "left", @box_width / 2); 
             printf("\n")
         end
 
