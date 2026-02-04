@@ -19,7 +19,7 @@ class UserInterface
     end
 
     private def puts_bordered_line(sentence, align = "left", width = @box_width)
-        sentence_length = sentence.length
+        sentence_length = sentence.gsub(/\e\[[0-9;]*m/, '').length
         case align
         when "left"
             puts("| " + sentence + (" " * (width - sentence_length - 3))  + "|")
@@ -31,7 +31,7 @@ class UserInterface
     end
 
     private def prints_bordered_line(sentence, align = "left", width = @box_width)
-        sentence_length = sentence.length
+        sentence_length = sentence.gsub(/\e\[[0-9;]*m/, '').length
         case align
         when "left"
             printf("| " + sentence + (" " * (width - sentence_length - 3))  + "|")
@@ -64,8 +64,8 @@ class UserInterface
 
         if (@game.player != nil) && (@game.enemy) != nil
             print_fill("=")
-            prints_bordered_line("#{@game.player.name}", "center", @box_width/2); 
-            prints_bordered_line("#{@game.enemy.name}", "center", @box_width/2); 
+            prints_bordered_line("#{@game.player.name_colorized}", "center", @box_width/2); 
+            prints_bordered_line("#{@game.enemy.name_colorized}", "center", @box_width/2); 
             printf("\n")
             prints_bordered_line("HP: #{@game.player.hp}", "left", @box_width / 2); 
             prints_bordered_line("HP: #{@game.enemy.hp}", "left", @box_width / 2)

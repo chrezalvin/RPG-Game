@@ -26,7 +26,7 @@ class GameState
         if enemy.is_a? Creature
             @enemy = enemy
 
-            @logs.add_log("A #{@enemy.name} challenged you to a duel!")
+            @logs.add_log("A #{@enemy.name_colorized} challenged you to a duel!")
         end
 
         self
@@ -36,7 +36,7 @@ class GameState
         if player.is_a? Creature
             @player = player
 
-            @logs.add_log("You choose player")
+            @logs.add_log("You choose #{player.name_colorized}")
         end
     end
 

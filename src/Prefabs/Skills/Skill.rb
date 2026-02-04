@@ -1,4 +1,5 @@
 require_relative "../Creatures/Creature"
+require "colorize"
 
 class Skill
     attr_reader :name, :damage, :description
@@ -24,5 +25,9 @@ class Skill
         unless creature.is_a? Creature
             throw "The skill must be used on a Creature. However, it is used on #{creature.class}"
         end
+    end
+
+    def name_colorized
+        @name.colorize(:light_magenta)  
     end
 end
