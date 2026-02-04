@@ -5,6 +5,7 @@ require "./src/UserInterface"
 require "./src/UserInput"
 require "./src/Prefabs/Menu/MainMenu"
 require "./src/Prefabs/Creatures/Enemies/Minotaur"
+require "colorize"
 
 if __FILE__ == $0
     iii = 0
