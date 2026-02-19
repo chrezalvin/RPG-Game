@@ -1,6 +1,6 @@
-require_relative "./Prefabs/Menu/MenuElement"
+require_relative "./Parents/MenuElement"
+require_relative "./Parents/Menu"
 require_relative "./Logs"
-require_relative "./Prefabs/Menu/Menu"
 require_relative "./Game"
 require "colorize"
 
@@ -67,11 +67,11 @@ class UserInterface
             prints_bordered_line("#{@game.player.name_colorized}", "center", @box_width/2); 
             prints_bordered_line("#{@game.enemy.name_colorized}", "center", @box_width/2); 
             printf("\n")
-            prints_bordered_line("HP: #{@game.player.hp}", "left", @box_width / 2); 
-            prints_bordered_line("HP: #{@game.enemy.hp}", "left", @box_width / 2)
+            prints_bordered_line("HP: #{@game.player.current_hp}/#{@game.player.max_hp}", "left", @box_width / 2); 
+            prints_bordered_line("HP: #{@game.enemy.current_hp}/#{@game.enemy.max_hp}", "left", @box_width / 2)
             printf("\n")
-            prints_bordered_line("MP: #{@game.player.mp}", "left", @box_width / 2); 
-            prints_bordered_line("MP: #{@game.enemy.mp}", "left", @box_width / 2); 
+            prints_bordered_line("MP: #{@game.player.current_mp}/#{@game.player.max_mp}", "left", @box_width / 2); 
+            prints_bordered_line("MP: #{@game.enemy.current_mp}/#{@game.enemy.max_mp}", "left", @box_width / 2); 
             printf("\n")
         end
 

@@ -1,6 +1,6 @@
-require_relative "./Prefabs/Creatures/Creature"
+require_relative "./Parents/Creature"
+require_relative "./Parents/Menu"
 require_relative "./Prefabs/Creatures/Enemies/Minotaur"
-require_relative "./Prefabs/Menu/Menu"
 require_relative "./Prefabs/Menu/MainMenu"
 require_relative "./Logs"
 

@@ -46,13 +46,13 @@ class Game
     def play_game(player)
         @game_state.set_player(player.new())
 
-        @game_state.player.add_on_get_hit_listeners(lambda{|creature, damage| @game_state.logs.add_log("you received #{damage.to_s.colorize(:light_red)} damage")})
-        @game_state.player.add_on_use_skill_listeners(lambda{|player, skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")})
-        @game_state.player.add_on_dead_listeners(lambda do|player| 
+        @game_state.player.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("you received #{damage.to_s.colorize(:light_red)} damage")})
+        @game_state.player.add_on_use_skill_listener(lambda{|skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")})
+        @game_state.player.add_on_dead_listener(lambda do 
             @game_state.logs.add_log("You have been slain!")
             @current_menu = YouDeadMenu.new(self)
         end)
-
+        
         self.register_new_enemy
 
         @current_menu = PlayMenu.new(self)
@@ -72,10 +72,10 @@ class Game
 
     def register_new_enemy
         @game_state.set_enemy(@enemies_list.sample.new())
-        @game_state.enemy.add_on_get_hit_listeners(lambda{|creature, damage| @game_state.logs.add_log("#{creature.name_colorized} received #{damage.to_s.colorize(:light_red)} damage")})
-        @game_state.enemy.add_on_use_skill_listeners(lambda{|enemy, skill, player| @game_state.logs.add_log("#{enemy.name_colorized} used #{skill.name_colorized} on you")})
-        @game_state.enemy.add_on_dead_listeners(lambda do |enemy| 
-                @game_state.logs.add_log("#{enemy.name_colorized} is down!")
+        @game_state.enemy.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.to_s.colorize(:light_red)} damage")})
+        @game_state.enemy.add_on_use_skill_listener(lambda{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized} on you")})
+        @game_state.enemy.add_on_dead_listener(lambda do 
+                @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")
                 self.register_new_enemy
             end
         )
