@@ -1,5 +1,5 @@
-require_relative "./Menu"
-require_relative "./MenuElement"
+require_relative "../../Parents/Menu"
+require_relative "../../Parents/MenuElement"
 require_relative "../../Game"
 
 class YouDeadMenu < Menu

@@ -1,9 +1,11 @@
-require_relative "../Creatures/Creature"
+require_relative "./Creature"
 require "colorize"
 
 class Skill
     attr_reader :name, :damage, :description
 
+    # @@name = "unknown skill"
+    # @@description = "unknown description"
     def initialize(skill_owner)
         
         if skill_owner.is_a? Creature
@@ -12,7 +14,7 @@ class Skill
             throw "invalid skill owner! skill owner is a #{skill_owner.inspect}"
         end
 
-        @damage = 0
+        # @damage = 0
         @name = "unknown skill"
         @description = "unknown description"
     end
@@ -25,6 +27,8 @@ class Skill
         unless creature.is_a? Creature
             throw "The skill must be used on a Creature. However, it is used on #{creature.class}"
         end
+
+        return can_use_skill?(creature)
     end
 
     def name_colorized

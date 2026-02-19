@@ -1,15 +1,15 @@
-require_relative "./Skill"
+require_relative "../../Parents/Skill"
 require_relative "../Damages/BasicDamage"
 
 class BasicAttack < Skill
   def initialize(skill_owner)
     super(skill_owner)
 
-    @damage = skill_owner.atk
+    @damage = @skill_owner.atk.atk_amount
     @name = "Basic Attack"
   end
 
-  def can_use_skill?
+  def can_use_skill?(creature)
     true
   end
 

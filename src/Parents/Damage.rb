@@ -1,4 +1,4 @@
-require_relative "../Creatures/Creature"
+require_relative "./Creature"
 
 class Damage
     attr_accessor :damage, :damage_type
@@ -8,8 +8,7 @@ class Damage
             @damage_dealer = damage_dealer
             @damage_type = "unknown"
         else
-            throw "invalid type"
+            throw "invalid type, Damage amount is #{damage_amount.class} and damage_dealer is #{damage_dealer.class}"
         end
-
     end
 end

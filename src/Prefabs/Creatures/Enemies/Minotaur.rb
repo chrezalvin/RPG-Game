@@ -1,5 +1,5 @@
-require_relative "../Creature"
 require_relative "../../Skills/BasicAttack"
+require_relative "../../../Parents/Creature"
 
 class Minotaur < Creature
     def initialize
