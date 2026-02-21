@@ -48,6 +48,8 @@ class Game
 
         @game_state.player.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("you received #{damage.to_s.colorize(:light_red)} damage")})
         @game_state.player.add_on_use_skill_listener(lambda{|skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")})
+        @game_state.player.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")})
+        @game_state.player.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")})
         @game_state.player.add_on_dead_listener(lambda do 
             @game_state.logs.add_log("You have been slain!")
             @current_menu = YouDeadMenu.new(self)
@@ -74,6 +76,8 @@ class Game
         @game_state.set_enemy(@enemies_list.sample.new())
         @game_state.enemy.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.to_s.colorize(:light_red)} damage")})
         @game_state.enemy.add_on_use_skill_listener(lambda{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized} on you")})
+        @game_state.enemy.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is affected by #{effect.name_colorized}")})
+        @game_state.enemy.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")})
         @game_state.enemy.add_on_dead_listener(lambda do 
                 @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")
                 self.register_new_enemy

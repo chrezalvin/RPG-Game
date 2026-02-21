@@ -4,8 +4,12 @@ require "colorize"
 class Skill
     attr_reader :name, :damage, :description
 
-    # @@name = "unknown skill"
-    # @@description = "unknown description"
+    class << self
+        attr_reader :description, :name
+    end
+
+    @name = "unknown skill"
+    @description = "unknown description"
     def initialize(skill_owner)
         
         if skill_owner.is_a? Creature
@@ -13,10 +17,18 @@ class Skill
         else
             throw "invalid skill owner! skill owner is a #{skill_owner.inspect}"
         end
+    end
 
-        # @damage = 0
-        @name = "unknown skill"
-        @description = "unknown description"
+    def name
+        self.class.name
+    end
+
+    def description
+        self.class.description
+    end
+
+    def name_colorized
+        self.class.name.colorize(:light_magenta)  
     end
 
     def can_use_skill?(creature)
@@ -29,9 +41,5 @@ class Skill
         end
 
         return can_use_skill?(creature)
-    end
-
-    def name_colorized
-        @name.colorize(:light_magenta)  
     end
 end

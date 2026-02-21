@@ -1,3 +1,4 @@
+require "colorize"
 require_relative "../../Parents/Menu"
 require_relative "../../Parents/MenuElement"
 
@@ -10,9 +11,14 @@ class ChooseSkillMenu < Menu
           .player
           .usable_skills
           .each_with_index
-          .map{
-            |skill, idx| MenuElement.new(skill.name, lambda{game.initiate_skill(idx)}, skill.description)
-          }
+          .map{            
+            |skill, idx| 
+              if skill.can_use_skill?(game.enemy)
+                MenuElement.new(skill.name, lambda{game.initiate_skill(idx)}, skill.description)
+              else
+                MenuElement.new("#{skill.name.to_s.colorize(:grey)}", lambda{}, skill.description)
+              end
+            }
           .push(MenuElement.new("Back", lambda{game.back_to_play_menu}))
       end
   end

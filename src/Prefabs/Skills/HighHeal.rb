@@ -1,11 +1,11 @@
 require_relative "../../Parents/Skill"
 
-class BasicHeal < Skill
+class HighHeal < Skill
 
-  @skill_mp_usage = 10
-  @skill_hp_heal_percentage = 15
-  @description = "Basic Healing, heal #{@skill_hp_heal_percentage}% of your hp, uses #{@skill_mp_usage} mana"
-  @name = "Basic Heal"
+  @skill_mp_usage = 15
+  @skill_hp_heal_percentage = 30
+  @description = "Great Heal! heal #{@skill_hp_heal_percentage}% of your hp, uses #{@skill_mp_usage} mana"
+  @name = "Great Heal"
   def initialize(skill_owner)
     super(skill_owner)
   end
