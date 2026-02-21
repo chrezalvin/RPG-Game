@@ -1,15 +1,15 @@
 require_relative "../../Skills/BasicAttack"
-require_relative "../../Skills/RazorClaw"
+require_relative "../../Skills/AcrobaticSlash"
 require_relative "../../../Parents/Creature"
 
-class NovaTheCat < Creature
-    @name = "Nova the Cat"
+class GiantSpider < Creature
     @description = nil
-    @chance_to_use_skill = 0.3
+    @name = "Giant Spider"
+    @chance_to_use_skill = 0.5
     def initialize
-        super(hp: 100, mp: 35, atk: 36, matk:0, nmpr: 1, nhpr: 10)
+        super(hp: 60, mp: 60, atk: 5, matk: 20, nmpr: 10, nhpr: 10)
         @basic_attack = BasicAttack.new(self)
-        @usable_skills = [RazorClaw.new(self)]
+        @usable_skills = [AcrobaticSlash.new(self)]
     end
 
     def self.chance_to_use_skill

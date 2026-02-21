@@ -1,11 +1,11 @@
 class Mp
-  attr_reader :current_mp, :max_mp
+  attr_reader :current_mp, :max_mp, :initial_mp, :initial_max_mp
 
   @@initial_mp = 100
   @@initial_max_mp = 100
-  def initialize(current_mp = @@initial_mp, max_mp = @@initial_max_mp)
-    @current_mp = current_mp
-    @max_mp = max_mp
+  def initialize(current_mp: nil, max_mp: nil)
+    @current_mp = current_mp || @@initial_mp
+    @max_mp = max_mp || @@initial_max_mp
 
     @on_mp_used_listeners = []
     @on_mp_added_listeners = []

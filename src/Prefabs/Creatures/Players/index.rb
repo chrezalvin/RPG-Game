@@ -1,8 +1,10 @@
 require_relative "./Viking"
+require_relative "./Mage"
 
 class PlayersList
     @@players_list = [
-        Viking
+        Viking,
+        Mage
     ]
 
     def self.get_player_list
