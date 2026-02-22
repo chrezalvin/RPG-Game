@@ -21,14 +21,18 @@ class Creature
       attr_reader :description, :name
   end
 
-    attr_reader :atk, :matk, :name, :usable_skills, :basic_attack, :effects,
+    attr_reader :name, :usable_skills, :basic_attack, :effects,
       :current_hp, :max_hp, :add_on_heal_listener, :add_on_get_hit_listener, :add_on_dead_listener, :add_on_hp_changed_listener,
       :current_mp, :max_mp, :add_on_mp_used_listener, :add_on_mp_added_listener, :add_on_mp_changed_listener,
+      :atk_amount, :atk_colorized, 
+      :matk_amount, :matk_colorized,
       :natural_hp_regen,
       :natural_mp_regen
 
-    def_delegators :@hp, :current_hp, :max_hp, :add_on_heal_listener, :add_on_get_hit_listener, :add_on_dead_listener, :add_on_hp_changed_listener
-    def_delegators :@mp, :current_mp, :max_mp, :add_on_mp_used_listener, :add_on_mp_added_listener, :add_on_mp_changed_listener
+    def_delegators :@hp, :current_hp, :current_hp_colorized, :max_hp_colorized, :max_hp, :add_on_heal_listener, :add_on_get_hit_listener, :add_on_dead_listener, :add_on_hp_changed_listener
+    def_delegators :@mp, :current_mp, :current_mp_colorized, :max_mp_colorized, :max_mp, :add_on_mp_used_listener, :add_on_mp_added_listener, :add_on_mp_changed_listener
+    def_delegators :@atk, :atk_amount, :atk_colorized
+    def_delegators :@matk, :matk_amount, :matk_colorized
     def_delegators :@nhpr, :natural_hp_regen
     def_delegators :@nmpr, :natural_mp_regen
 
@@ -71,18 +75,16 @@ class Creature
     end
 
     def take_damage(damage)
-      if damage.is_a? Damage
-        unless damage.is_effect
-          @effects.each{|effect| effect.on_before_take_damage(damage)}
-        end
+      throw "Error: damage must be an instance of Damage, got #{damage.class}" unless damage.is_a? Damage
 
-        @hp.take_damage(damage.damage)
+      unless damage.is_effect
+        @effects.each{|effect| effect.on_before_take_damage(damage)}
+      end
 
-        unless damage.is_effect
-          @effects.each{|effect| effect.on_after_take_damage(damage)}
-        end
-      else
-        throw "Error: damage is not from Damage class"
+      @hp.take_damage(damage)
+
+      unless damage.is_effect
+        @effects.each{|effect| effect.on_after_take_damage(damage)}
       end
     end
 

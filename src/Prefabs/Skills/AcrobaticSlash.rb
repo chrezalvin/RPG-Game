@@ -25,8 +25,11 @@ class AcrobaticSlash < Skill
     def use_skill(creature)
       if super(creature)
         @skill_owner.use_mp(self.class.skill_mp_usage)
-        skill = SkillDamage.new((self.class.damage_multiplier * @skill_owner.atk.atk_amount).to_i, creature)
-        creature.take_damage(skill)
+
+        damage_amount = (self.class.damage_multiplier * @skill_owner.atk_amount).to_i
+        skillDamage = SkillDamage.new(damage_amount, @skill_owner)
+
+        skillDamage.apply_to(creature)
       end
     end
 end

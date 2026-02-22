@@ -55,4 +55,12 @@ class Mp
   def add_on_mp_changed_listener(listener)
     @on_mp_changed_listeners.push(listener)
   end
+
+  def current_mp_colorized
+    @current_mp.to_s.colorize(:blue)
+  end
+
+  def max_mp_colorized
+    @max_mp.to_s.colorize(:blue)
+  end
 end

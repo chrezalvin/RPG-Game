@@ -18,6 +18,9 @@ class Shielded < Effect
 
         damage.damage = (damage.damage * self.class.damage_reduction_multiplier).to_i
         @is_used = true
+
+
+        @effect_owner.cleanup_expired_effects
     end
 
     def is_expired?

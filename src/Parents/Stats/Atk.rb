@@ -5,4 +5,8 @@ class Atk
   def initialize(amount: nil)
     @atk_amount = amount || @@initial_atk
   end
+
+  def atk_colorized
+    @atk_amount.to_s.colorize(:yellow)
+  end
 end

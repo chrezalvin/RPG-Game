@@ -15,7 +15,10 @@ class BasicAttack < Skill
 
   def use_skill(creature)
     if super(creature)
-      creature.take_damage(BasicDamage.new(@skill_owner.atk.atk_amount, @skill_owner))
+      damage_amount = @skill_owner.atk_amount
+      basicDamage = BasicDamage.new(damage_amount, @skill_owner)
+
+      basicDamage.apply_to(creature)
       @skill_owner.regenerate_mp
     end
   end

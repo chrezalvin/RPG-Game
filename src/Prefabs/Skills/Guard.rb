@@ -21,7 +21,10 @@ class Guard < Skill
   def use_skill(creature)
     if super(creature)
       @skill_owner.use_mp(self.class.skill_mp_usage)
-      @skill_owner.apply_effect(Shielded.new())
+
+      effect = Shielded.new()
+      
+      effect.apply_effect(@skill_owner)
     end
   end
 end

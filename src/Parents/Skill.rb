@@ -36,9 +36,7 @@ class Skill
     end
 
     def use_skill(creature)
-        unless creature.is_a? Creature
-            throw "The skill must be used on a Creature. However, it is used on #{creature.class}"
-        end
+        throw "The skill must be used on a Creature. However, it is used on #{creature.class}" unless creature.is_a? Creature
 
         return can_use_skill?(creature)
     end

@@ -3,7 +3,7 @@ require_relative "../Damages/SkillDamage"
 
 class MagicArrows < Skill
 
-  @skill_mp_usage = 30
+  @skill_mp_usage = 40
   @skill_damage_multiplier = 0.5
   @description = "Cast three arrows made out of magic, each arrow deals #{@skill_damage_multiplier}x of caster's Matk, uses #{@skill_mp_usage} mana"
   @name = "Magic Arrows"
@@ -26,9 +26,12 @@ class MagicArrows < Skill
   def use_skill(creature)
     if super(creature)
       @skill_owner.use_mp(self.class.skill_mp_usage)
+
       for i in 1..3
-        skillDamage = SkillDamage.new((@skill_owner.matk.matk_amount * self.class.skill_damage_multiplier).to_i, @skill_owner)
-        creature.take_damage(skillDamage)
+        damage_amount = (@skill_owner.matk_amount * self.class.skill_damage_multiplier).to_i
+        skillDamage = SkillDamage.new(damage_amount, @skill_owner)
+
+        skillDamage.apply_to(creature)
       end
     end
   end

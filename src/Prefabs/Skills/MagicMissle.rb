@@ -26,8 +26,11 @@ class MagicMissle < Skill
   def use_skill(creature)
     if super(creature)
       @skill_owner.use_mp(self.class.skill_mp_usage)
-      skillDamage = SkillDamage.new((@skill_owner.matk.matk_amount * self.class.skill_damage_multiplier).to_i, @skill_owner)
-      creature.take_damage(skillDamage)
+      
+      damage_amount = (@skill_owner.matk_amount * self.class.skill_damage_multiplier).to_i
+      skillDamage = SkillDamage.new(damage_amount, @skill_owner)
+
+      skillDamage.apply_to(creature)
     end
   end
 end
