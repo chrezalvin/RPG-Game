@@ -1,5 +1,5 @@
 class Mp
-  attr_reader :current_mp, :max_mp, :initial_mp, :initial_max_mp
+  attr_reader :current_mp, :max_mp
 
   @@initial_mp = 100
   @@initial_max_mp = 100
@@ -13,35 +13,31 @@ class Mp
   end
 
   def add_mp(amount)
-    if amount.is_a? Integer
-      @on_mp_added_listeners.each{
-        |listener| listener.call(amount)
-      }
+    throw "Error: the amount of mp to add is not an integer" unless amount.is_a? Integer
 
-      @current_mp = (@current_mp + amount).clamp(0, @max_mp)
+    @on_mp_added_listeners.each{
+      |listener| listener.call(amount)
+    }
 
-      @on_mp_changed_listeners.each{
-        |listener| listener.call(@current_mp)
-      }
-    else
-      throw "Error: the amount of mp to add is not an integer"
-    end
+    @current_mp = (@current_mp + amount).clamp(0, @max_mp)
+
+    @on_mp_changed_listeners.each{
+      |listener| listener.call(@current_mp)
+    }
   end
 
   def use_mp(amount)
-    if amount.is_a? Integer
-      @on_mp_used_listeners.each{
-        |listener| listener.call(amount)
-      }
+    throw "Error: the amount of mp used is not an integer" unless amount.is_a? Integer
 
-      @current_mp = @current_mp - amount
+    @on_mp_used_listeners.each{
+      |listener| listener.call(amount)
+    }
 
-      @on_mp_changed_listeners.each{
-        |listener| listener.call(@current_mp)
-      }
-    else
-      throw "Error: the amount of mp used is not an integer"
-    end
+    @current_mp = @current_mp - amount
+
+    @on_mp_changed_listeners.each{
+      |listener| listener.call(@current_mp)
+    }
   end
 
   def add_on_mp_used_listener(listener)

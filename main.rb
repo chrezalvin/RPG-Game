@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require "./src/Game"
-require "./src/UserInterface"
-require "./src/UserInput"
-require "./src/Prefabs/Menu/MainMenu"
-require "./src/Prefabs/Creatures/Enemies/Minotaur"
+require_relative "src/Game"
+require_relative "src/UserInterface"
+require_relative "src/UserInput"
+require_relative "src/Prefabs/Menu/MainMenu"
+require_relative "src/Prefabs/Creatures/Enemies/Minotaur"
 require "colorize"
 
 if __FILE__ == $0
@@ -24,7 +24,7 @@ if __FILE__ == $0
         user_input.get_arrow_input()
         iii += 1
 
-        if iii > 20
+        if iii > 10000
             game.quit_game()
         end
     end 

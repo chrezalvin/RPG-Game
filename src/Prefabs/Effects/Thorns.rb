@@ -7,6 +7,7 @@ class Thorns < Effect
     @name = "Thorns"
     @description = "Deals #{@damage_fraction_multiplier}x damage to the attacker back when the bearer takes damage for #{@initial_durability} times"
     def initialize()
+        super()
         @durability = self.class.initial_durability
     end
 

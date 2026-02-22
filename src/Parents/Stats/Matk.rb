@@ -1,5 +1,5 @@
 class Matk
-  attr_accessor :matk_amount, :initial_matk
+  attr_accessor :matk_amount
 
   @@initial_matk = 10
   def initialize(amount: nil)

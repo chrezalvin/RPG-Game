@@ -1,6 +1,6 @@
 require_relative "../../../Parents/Creature"
 require_relative "../../Skills/HighHeal"
-require_relative "../../Skills/BasicHeal"
+require_relative "../../Skills/BasicHealing"
 require_relative "../../Skills/MagicMissle"
 require_relative "../../Skills/MagicArrows"
 require_relative "../../Skills/BasicAttack"
@@ -15,7 +15,7 @@ class Mage < Creature
         @basic_attack = BasicAttack.new(self)
         @usable_skills = [
             HighHeal.new(self), 
-            BasicHeal.new(self), 
+            BasicHealing.new(self), 
             MagicMissle.new(self), 
             MagicArrows.new(self)
         ]

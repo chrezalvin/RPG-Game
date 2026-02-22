@@ -10,7 +10,7 @@ require_relative "./Prefabs/Menu/InspectingMenu"
 require "colorize"
 
 class Game
-    attr_reader :player_list, :enemies_list, :current_menu, :inspecting
+    attr_reader :player_list, :enemies_list, :current_menu, :inspecting, :enemy_about_to_use
 
     def initialize
         @game_state = GameState.new()
@@ -18,29 +18,40 @@ class Game
         @player_list = PlayersList.get_player_list
         @enemies_list = EnemiesList.get_enemies_list
         @inspecting = nil
+        @enemy_about_to_use = nil
     end
 
     def initiate_skill(skill_idx)
         if @game_state.player != nil && @game_state.enemy != nil
             @game_state.player.use_skill(skill_idx, @game_state.enemy)
 
-            self.trigger_enemy_attack
-        end
+            if @game_state.enemy.is_dead?
+                self.register_new_enemy
+            else
+                self.trigger_enemy_attack
+            end
 
-        self.back_to_play_menu
+            self.decide_next_enemy_action
+        end
     end
 
     def trigger_player_basic_attack
         if @game_state.player != nil && @game_state.enemy != nil
             @game_state.player.use_basic_attack(@game_state.enemy)
 
-            self.trigger_enemy_attack
+            if @game_state.enemy.is_dead?
+                self.register_new_enemy
+            else
+                self.trigger_enemy_attack
+            end
+
+            self.decide_next_enemy_action
         end
     end
 
     def trigger_enemy_attack
         if @game_state.player != nil && @game_state.enemy != nil
-            @game_state.enemy.use_basic_attack(@game_state.player)  
+            @game_state.enemy.use_skill_by_instance(@enemy_about_to_use, @game_state.player)
         end
     end
 
@@ -60,6 +71,14 @@ class Game
         self.register_new_enemy
 
         @current_menu = PlayMenu.new(self)
+    end
+
+    def decide_next_enemy_action
+        if @game_state.enemy != nil && @game_state.player != nil
+            @enemy_about_to_use = @game_state.enemy.decide_next_action(@game_state.player)
+
+            @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is preparing to use #{@enemy_about_to_use.name_colorized}!")
+        end
     end
 
     def request_choose_player
@@ -82,9 +101,10 @@ class Game
         @game_state.enemy.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")})
         @game_state.enemy.add_on_dead_listener(lambda do 
                 @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")
-                self.register_new_enemy
             end
         )
+
+        self.decide_next_enemy_action
     end
 
     # setters

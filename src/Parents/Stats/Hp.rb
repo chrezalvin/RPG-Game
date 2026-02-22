@@ -1,7 +1,8 @@
 require_relative "../Damage"
+require_relative "../Heal"
 
 class Hp
-  attr_reader :current_hp, :max_hp, :initial_hp, :initial_max_hp
+  attr_reader :current_hp, :max_hp
 
   @@initial_hp = 100
   @@initial_max_hp = 100
@@ -36,20 +37,22 @@ class Hp
     end
   end
 
-  def heal(amount)
-    if amount.is_a? Integer
-      @on_heal_listeners.each{
-        |listener| listener.call(amount)
-      }
+  def heal(heal_instance)
+    throw "Error: healInstance is not a Heal object" unless heal_instance.is_a? Heal
+    
+    @on_heal_listeners.each{
+      |listener| listener.call(heal_instance)
+    }
 
-      @current_hp = (@current_hp + amount).clamp(0, @max_hp)
+    @current_hp = (@current_hp + heal_instance.heal).clamp(0, @max_hp)
 
-      @on_hp_changed_listeners.each{
-        |listener| listener.call(@current_hp)
-      }
-    else
-      throw "Error: heal amount is not an integer"
-    end
+    @on_hp_changed_listeners.each{
+      |listener| listener.call(@current_hp)
+    }
+  end
+
+  def is_dead?
+    @current_hp <= 0
   end
 
   def add_on_get_hit_listener(listener)
