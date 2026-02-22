@@ -7,6 +7,7 @@ require_relative "./Stats/Matk"
 require_relative "./Stats/NaturalMpRegen"
 require_relative "./Stats/NaturalHpRegen"
 require_relative "./Damage"
+require_relative "./Heal"
 require_relative "./Effect"
 
 require_relative "./Skill"
@@ -29,8 +30,23 @@ class Creature
       :natural_hp_regen,
       :natural_mp_regen
 
-    def_delegators :@hp, :current_hp, :current_hp_colorized, :max_hp_colorized, :max_hp, :add_on_heal_listener, :add_on_get_hit_listener, :add_on_dead_listener, :add_on_hp_changed_listener
-    def_delegators :@mp, :current_mp, :current_mp_colorized, :max_mp_colorized, :max_mp, :add_on_mp_used_listener, :add_on_mp_added_listener, :add_on_mp_changed_listener
+    def_delegators :@hp, 
+      :current_hp, 
+      :current_hp_colorized, 
+      :max_hp_colorized, 
+      :max_hp, 
+      :add_on_heal_listener, 
+      :add_on_get_hit_listener, 
+      :add_on_dead_listener, 
+      :add_on_hp_changed_listener
+    def_delegators :@mp, 
+      :current_mp, 
+      :current_mp_colorized, 
+      :max_mp_colorized, 
+      :max_mp, 
+      :add_on_mp_used_listener, 
+      :add_on_mp_added_listener, 
+      :add_on_mp_changed_listener
     def_delegators :@atk, :atk_amount, :atk_colorized
     def_delegators :@matk, :matk_amount, :matk_colorized
     def_delegators :@nhpr, :natural_hp_regen
@@ -88,12 +104,14 @@ class Creature
       end
     end
 
-    def heal(amount)
-      @effects.each{|effect| effect.on_before_heal(amount)}
+    def heal(heal_instance)
+      throw "Error: healInstance must be an instance of Heal, got #{heal_instance.class}" unless heal_instance.is_a? Heal
 
-      @hp.heal(amount)
+      @effects.each{|effect| effect.on_before_heal(heal_instance)}
 
-      @effects.each{|effect| effect.on_after_heal(amount)}
+      @hp.heal(heal_instance)
+
+      @effects.each{|effect| effect.on_after_heal(heal_instance)}
     end
 
     def use_mp(amount)
@@ -123,19 +141,35 @@ class Creature
     end
 
     def use_skill(idx, target)
-        if target.is_a? Creature
-            skill = @usable_skills[idx]
-            if skill.is_a? Skill
-                if skill.can_use_skill?(target)
-                    @effects.each{|effect| effect.on_before_use_skill(skill, target)}
+      throw "Error: target must be an instance of Creature, got #{target.class}" unless target.is_a? Creature
+      throw "Error: skill index must be an integer, got #{idx.class}" unless idx.is_a? Integer
 
-                    @use_skill_listeners.each{|listener| listener.call(skill, target)}
-                    skill.use_skill(target)
+      skill = @usable_skills[idx]
+      
+      throw "Error: skill is not an instance of Skill, got #{skill.class}" unless skill.is_a? Skill
 
-                    @effects.each{|effect| effect.on_after_use_skill(skill, target)}
-                end
-            end
-        end
+      if skill.can_use_skill?(target)
+        @effects.each{|effect| effect.on_before_use_skill(skill, target)}
+
+        @use_skill_listeners.each{|listener| listener.call(skill, target)}
+        skill.use_skill(target)
+
+        @effects.each{|effect| effect.on_after_use_skill(skill, target)}
+      end
+    end
+
+    def use_skill_by_instance(skill, target)
+      throw "Error: target must be an instance of Creature, got #{target.class}" unless target.is_a? Creature
+      throw "Error: skill must be an instance of Skill, got #{skill.class}" unless skill.is_a? Skill
+
+      if skill.can_use_skill?(target)
+        @effects.each{|effect| effect.on_before_use_skill(skill, target)}
+
+        @use_skill_listeners.each{|listener| listener.call(skill, target)}
+        skill.use_skill(target)
+
+        @effects.each{|effect| effect.on_after_use_skill(skill, target)}
+      end
     end
 
     def apply_effect(effect)
@@ -156,11 +190,13 @@ class Creature
     end
 
     def decide_next_action(creature)
-      unless creature.is_a? Creature
-        throw "Error: creature must be an instance of Creature, got #{creature.class}"
-      end
+      throw "Error: target must be an instance of Creature, got #{creature.class}" unless creature.is_a? Creature
 
       nil
+    end
+
+    def is_dead?
+      @hp.is_dead?
     end
 
     def add_on_use_skill_listener(listener)

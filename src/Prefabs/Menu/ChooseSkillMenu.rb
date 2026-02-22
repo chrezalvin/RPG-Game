@@ -14,7 +14,7 @@ class ChooseSkillMenu < Menu
           .map{            
             |skill, idx| 
               if skill.can_use_skill?(game.enemy)
-                MenuElement.new(skill.name, lambda{game.initiate_skill(idx)}, skill.description)
+                MenuElement.new(skill.name, lambda{game.initiate_skill(idx); game.back_to_play_menu}, skill.description)
               else
                 MenuElement.new("#{skill.name.to_s.colorize(:grey)}", lambda{}, skill.description)
               end

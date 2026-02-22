@@ -1,5 +1,6 @@
 require_relative "./Damage"
 require_relative "./Creature"
+require_relative "./Heal"
 
 class Effect
     class << self
@@ -24,8 +25,12 @@ class Effect
     def on_after_deal_damage(damage)
         throw "damage must be an instance of Damage, got #{damage.class}" unless damage.is_a? Damage
     end
-    def on_before_heal(heal_amount); end
-    def on_after_heal(heal_amount); end
+    def on_before_heal(heal_instance)
+        throw "heal_instance must be an instance of Heal, got #{heal_instance.class}" unless heal_instance.is_a? Heal
+    end
+    def on_after_heal(heal_instance)
+        throw "heal_instance must be an instance of Heal, got #{heal_instance.class}" unless heal_instance.is_a? Heal
+    end
     def on_before_use_skill(skill, target)
         throw "skill must be an instance of Skill, got #{skill.class}" unless skill.is_a? Skill
         throw "target must be an instance of Creature, got #{target.class}" unless target.is_a? Creature
