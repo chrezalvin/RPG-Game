@@ -5,4 +5,8 @@ class Matk
   def initialize(amount: nil)
     @matk_amount = amount || @@initial_matk
   end
+
+  def matk_colorized
+    @matk_amount.to_s.colorize(:purple)
+  end
 end

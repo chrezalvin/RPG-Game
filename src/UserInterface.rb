@@ -2,6 +2,7 @@ require_relative "./Parents/MenuElement"
 require_relative "./Parents/Menu"
 require_relative "./Logs"
 require_relative "./Game"
+require_relative "./Parents/Creature"
 require "colorize"
 
 class UserInterface
@@ -62,7 +63,7 @@ class UserInterface
             end
         end
 
-        if (@game.player != nil) && (@game.enemy) != nil
+        if (@game.player != nil) && (@game.enemy != nil)
             print_fill("=")
             prints_bordered_line("#{@game.player.name_colorized}", "center", @box_width/2); 
             prints_bordered_line("#{@game.enemy.name_colorized}", "center", @box_width/2); 
@@ -73,6 +74,22 @@ class UserInterface
             prints_bordered_line("MP: #{@game.player.current_mp}/#{@game.player.max_mp}", "left", @box_width / 2); 
             prints_bordered_line("MP: #{@game.enemy.current_mp}/#{@game.enemy.max_mp}", "left", @box_width / 2); 
             printf("\n")
+        end
+
+        if @game.inspecting != nil
+            inspecting = @game.inspecting
+            buffsDebuffs = inspecting.effects.map{|effect| effect.name}.join(", ")
+
+            
+
+            print_fill("=")
+            puts_bordered_line("#{inspecting.name}", "center")
+            puts_bordered_line("", "left")
+            puts_bordered_line("HP: #{inspecting.current_hp_colorized}/#{inspecting.max_hp_colorized}  MP: #{inspecting.current_mp_colorized}/#{inspecting.max_mp_colorized}", "left")
+            puts_bordered_line("Atk: #{inspecting.atk_colorized}  Matk: #{inspecting.matk_colorized}", "left")
+            puts_bordered_line("Natural HP Regen: #{inspecting.natural_hp_regen}", "left")
+            puts_bordered_line("Natural MP Regen: #{inspecting.natural_mp_regen}", "left")
+            puts_bordered_line("Buffs/Debuffs: #{buffsDebuffs}", "left")
         end
 
         print_fill("=")

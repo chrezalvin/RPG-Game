@@ -15,15 +15,25 @@ class Menu
 
     def focus_next_element
         @selected_idx = (@selected_idx + 1) % (@menu_list.length)
+
+        self.hover_current_element
     end
 
     def focus_prev_element
         @selected_idx = (@selected_idx - 1) % (@menu_list.length)
+
+        self.hover_current_element
     end
 
     def select_current_element
         if @menu_list[@selected_idx].is_a? MenuElement
             @menu_list[@selected_idx].select_menu_element()
+        end
+    end
+
+    def hover_current_element
+        if @menu_list[@selected_idx].is_a? MenuElement
+            @menu_list[@selected_idx].hover_menu_element()
         end
     end
 

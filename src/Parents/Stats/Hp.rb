@@ -1,3 +1,5 @@
+require_relative "../Damage"
+
 class Hp
   attr_reader :current_hp, :max_hp, :initial_hp, :initial_max_hp
 
@@ -14,25 +16,23 @@ class Hp
   end
 
   def take_damage(damage)
-    if damage.is_a? Integer
-      @on_take_damage_listeners.each{
-          |listener| listener.call(damage)
+    throw "Error: damage is not a Damage object" unless damage.is_a? Damage
+
+    @on_take_damage_listeners.each{
+        |listener| listener.call(damage)
+    }
+
+    @current_hp = @current_hp - damage.damage
+
+    if(current_hp <= 0)
+      @current_hp = 0
+      @on_dead_listeners.each{
+        |listener| listener.call()
       }
-
-      @current_hp = @current_hp - damage
-
-      if(current_hp <= 0)
-        @current_hp = 0
-        @on_dead_listeners.each{
-          |listener| listener.call()
-        }
-      else
-        @on_hp_changed_listeners.each{
-          |listener| listener.call(@current_hp)
-        }
-      end
     else
-      throw "Error: damage is not an integer"
+      @on_hp_changed_listeners.each{
+        |listener| listener.call(@current_hp)
+      }
     end
   end
 
@@ -66,5 +66,13 @@ class Hp
 
   def add_on_hp_changed_listener(listener)
     @on_hp_changed_listeners.push(listener)
+  end
+
+  def current_hp_colorized
+    @current_hp.to_s.colorize(:red)
+  end
+
+  def max_hp_colorized
+    @max_hp.to_s.colorize(:red)
   end
 end

@@ -6,16 +6,18 @@ require_relative "./Prefabs/Menu/PlayMenu"
 require_relative "./Prefabs/Menu/MainMenu"
 require_relative "./Prefabs/Menu/YouDeadMenu"
 require_relative "./Prefabs/Menu/ChooseSkillMenu"
+require_relative "./Prefabs/Menu/InspectingMenu"
 require "colorize"
 
 class Game
-    attr_reader :player_list, :enemies_list, :current_menu
+    attr_reader :player_list, :enemies_list, :current_menu, :inspecting
 
     def initialize
         @game_state = GameState.new()
         @current_menu = MainMenu.new(self)
         @player_list = PlayersList.get_player_list
         @enemies_list = EnemiesList.get_enemies_list
+        @inspecting = nil
     end
 
     def initiate_skill(skill_idx)
@@ -46,7 +48,7 @@ class Game
     def play_game(player)
         @game_state.set_player(player.new())
 
-        @game_state.player.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("you received #{damage.to_s.colorize(:light_red)} damage")})
+        @game_state.player.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("you received #{damage.amount_colorized} #{damage.damage_type} damage")})
         @game_state.player.add_on_use_skill_listener(lambda{|skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")})
         @game_state.player.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")})
         @game_state.player.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")})
@@ -74,8 +76,8 @@ class Game
 
     def register_new_enemy
         @game_state.set_enemy(@enemies_list.sample.new())
-        @game_state.enemy.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.to_s.colorize(:light_red)} damage")})
-        @game_state.enemy.add_on_use_skill_listener(lambda{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized} on you")})
+        @game_state.enemy.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.amount_colorized} #{damage.damage_type} damage")})
+        @game_state.enemy.add_on_use_skill_listener(lambda{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized}")})
         @game_state.enemy.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is affected by #{effect.name_colorized}")})
         @game_state.enemy.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")})
         @game_state.enemy.add_on_dead_listener(lambda do 
@@ -111,8 +113,26 @@ class Game
         self
     end
 
+    def go_to_inspecting_menu
+        @current_menu = InspectingMenu.new(self)
+
+        self
+    end
+
     def player
         @game_state.player
+    end
+
+    def inspect_player
+        @inspecting = @game_state.player
+    end
+
+    def inspect_enemy
+        @inspecting = @game_state.enemy
+    end
+
+    def clear_inspecting
+        @inspecting = nil
     end
 
     def enemy

@@ -26,8 +26,11 @@ class RazorClaw < Skill
     def use_skill(creature)
         if super(creature)
             @skill_owner.use_mp(self.class.skill_mp_usage)
-            damage = TrueDamage.new(@skill_owner.atk.atk_amount * self.class.damage_multiplier, creature)
-            creature.take_damage(damage)
+
+            damage_amount = (@skill_owner.atk_amount * self.class.damage_multiplier).to_i
+            damage = TrueDamage.new(damage_amount, creature)
+
+            damage.apply_to(creature)
         end
     end
 end

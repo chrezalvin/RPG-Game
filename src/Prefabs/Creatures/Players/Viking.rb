@@ -11,7 +11,7 @@ class Viking < Creature
     @name = "Viking"
     @chance_to_use_skill = 0.5
     def initialize()
-        super(hp: 100, mp: 80, atk: 25, matk: 15, nmpr: 10, nhpr: 10)
+        super(hp: 100, mp: 80, atk: 20, matk: 10, nmpr: 10, nhpr: 10)
         @basic_attack = BasicAttack.new(self)
         @effects = []
         @usable_skills = [

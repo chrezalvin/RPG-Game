@@ -9,6 +9,7 @@ class Effect
     @name = "unknown effect"
     @description = "unknown description"
     def initialize
+        @effect_owner = nil
     end
 
     def on_before_take_damage(damage)
@@ -48,5 +49,12 @@ class Effect
 
     def is_expired?
         true
+    end
+
+    def apply_effect(creature)
+        throw "creature must be an instance of Creature, got #{creature.class}" unless creature.is_a? Creature
+
+        creature.apply_effect(self)
+        @effect_owner = creature
     end
 end

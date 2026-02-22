@@ -1,3 +1,4 @@
+require "colorize"
 require_relative "./Creature"
 
 class Damage
@@ -11,5 +12,19 @@ class Damage
         else
             throw "invalid type, Damage amount is #{damage_amount.class} and damage_dealer is #{damage_dealer.class}"
         end
+    end
+
+    def apply_to(creature)
+        throw "Error: creature is not a Creature object" unless creature.is_a? Creature
+
+        creature.take_damage(self)
+    end
+
+    def amount
+        @damage
+    end
+
+    def amount_colorized
+        @damage.to_s.colorize(:red)
     end
 end

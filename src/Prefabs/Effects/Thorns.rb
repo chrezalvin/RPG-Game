@@ -24,6 +24,8 @@ class Thorns < Effect
             effectDamage = EffectDamage.new((damage.damage * self.class.damage_fraction_multiplier).to_i)
             damage.damage_dealer.take_damage(effectDamage)
         end
+
+        @effect_owner.cleanup_expired_effects
     end
 
     def is_expired?
