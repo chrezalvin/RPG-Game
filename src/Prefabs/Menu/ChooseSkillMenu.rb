@@ -14,13 +14,28 @@ class ChooseSkillMenu < Menu
           .each_with_index
           .map{            
             |skill, idx| 
+              MenuElement.new(
+                menu_name: skill.name, 
+                on_selected: lambda{game.initiate_skill(idx); game.back_to_play_menu},
+                tooltip: skill.description
+              )
               if skill.can_use_skill?(game.enemy)
-                MenuElement.new(skill.name, lambda{game.initiate_skill(idx); game.back_to_play_menu}, skill.description)
+                MenuElement.new(
+                  menu_name: skill.name, 
+                  on_selected: lambda{game.initiate_skill(idx); game.back_to_play_menu},
+                  tooltip: skill.description
+                )
               else
-                MenuElement.new("#{skill.name.to_s.colorize(:grey)}", lambda{}, skill.description)
+                MenuElement.new(
+                  menu_name: "#{skill.name.to_s.colorize(:grey)}", 
+                  tooltip: skill.description
+                )
               end
             }
-          .push(MenuElement.new("Back", lambda{game.back_to_play_menu}))
+          .push(MenuElement.new(
+            menu_name: "Back", 
+            on_selected: lambda{game.back_to_play_menu}
+          ))
       end
   end
 end

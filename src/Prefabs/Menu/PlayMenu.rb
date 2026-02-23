@@ -8,15 +8,15 @@ class PlayMenu < Menu
         super()
         if game.is_a? Game
             unless game.player.basic_attack == nil
-                @menu_list.push(MenuElement.new("#{game.player.basic_attack.name}", lambda{game.trigger_player_basic_attack}))
+                @menu_list.push(MenuElement.new(menu_name: "#{game.player.basic_attack.name}", on_selected: lambda{game.trigger_player_basic_attack}))
             end
             unless game.player.usable_skills.empty?
-                @menu_list.push(MenuElement.new("Skills", lambda{game.go_to_choose_skill_menu}, "Select a skill"))
+                @menu_list.push(MenuElement.new(menu_name: "Skills", on_selected: lambda{game.go_to_choose_skill_menu}, tooltip: "Select a skill"))
             end
 
-            @menu_list.push(MenuElement.new("Inspect", lambda{game.go_to_inspecting_menu}, "Check status of you and your enemy"))
-            @menu_list.push(MenuElement.new("Do nothing", lambda{}))
-            @menu_list.push(MenuElement.new("Back to Main Menu", lambda{game.back_to_main_menu}))
+            @menu_list.push(MenuElement.new(menu_name: "Inspect", on_selected: lambda{game.go_to_inspecting_menu}, on_hover: "Check status of you and your enemy"))
+            @menu_list.push(MenuElement.new(menu_name: "Do nothing"))
+            @menu_list.push(MenuElement.new(menu_name: "Back to Main Menu", on_selected: lambda{game.back_to_main_menu}))
         end
     end
 end

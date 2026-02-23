@@ -1,4 +1,5 @@
 require "Parents/MenuElement"
+require "utils/Event"
 
 class Menu
     attr_reader :selected_idx
@@ -34,6 +35,18 @@ class Menu
     def hover_current_element
         if @menu_list[@selected_idx].is_a? MenuElement
             @menu_list[@selected_idx].hover_menu_element()
+        end
+    end
+
+    def select_right_current_element
+        if @menu_list[@selected_idx].is_a? MenuElement
+            @menu_list[@selected_idx].select_right_menu_element()
+        end
+    end
+
+    def select_left_current_element
+        if @menu_list[@selected_idx].is_a? MenuElement
+            @menu_list[@selected_idx].select_left_menu_element()
         end
     end
 

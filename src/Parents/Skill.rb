@@ -5,11 +5,12 @@ class Skill
     attr_reader :name, :damage, :description
 
     class << self
-        attr_reader :description, :name
+        attr_reader :description, :name, :sound_file
     end
 
     @name = "unknown skill"
     @description = "unknown description"
+    @sound_file = nil
     def initialize(skill_owner)
         throw "skill owner must be a Creature, got #{skill_owner.class}" unless skill_owner.is_a? Creature
 
@@ -22,6 +23,10 @@ class Skill
 
     def description
         self.class.description
+    end
+
+    def sound_file
+        self.class.sound_file
     end
 
     def name_colorized

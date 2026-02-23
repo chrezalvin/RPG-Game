@@ -2,23 +2,38 @@
 $LOAD_PATH.unshift(File.expand_path("src", __dir__))
 $LOAD_PATH.unshift(File.expand_path("src/Prefabs", __dir__))
 
+require "json"
+require "colorize"
+
 require_relative "src/Game"
 require_relative "src/UserInterface"
 require_relative "src/UserInput"
 require_relative "src/Prefabs/Menu/MainMenu"
 require_relative "src/Prefabs/Creatures/Enemies/Minotaur"
-require "colorize"
 
 if __FILE__ == $0
-    iii = 0
+    config = JSON.parse(File.read("config.json"))
+
+    if config["user_data_folder"] == nil || config["audio_folder"] == nil
+        puts "Error: Invalid config file. Please make sure the config file contains 'user_data_folder' and 'audio_folder' keys.".red
+        exit(1)
+    end
+
+    user_data_file = config["user_data_folder"]
+    audio_folder = config["audio_folder"]
+
+    select_sound_file = "select.mp3"
+
     game = Game.new()
     user_interface = UserInterface.new(game)
     user_input = UserInput.new()
     flag_exit = false
 
-    user_input.register_up_listener(lambda {game.current_menu.focus_prev_element})
-    user_input.register_down_listener(lambda {game.current_menu.focus_next_element})
-    user_input.register_enter_listener(lambda {game.current_menu.select_current_element})
+    user_input.register_up_listener(lambda {game.current_menu.focus_prev_element; game.play_audio(select_sound_file)})
+    user_input.register_down_listener(lambda {game.current_menu.focus_next_element; game.play_audio(select_sound_file)})
+    user_input.register_enter_listener(lambda {game.current_menu.select_current_element; game.play_audio(select_sound_file)})
+    user_input.register_right_listener(lambda {game.current_menu.select_right_current_element; game.play_audio(select_sound_file)})
+    user_input.register_left_listener(lambda {game.current_menu.select_left_current_element; game.play_audio(select_sound_file)})
     game.add_on_quit_game_listener(lambda {flag_exit = true})
 
     until flag_exit == true

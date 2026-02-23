@@ -1,5 +1,7 @@
 require "colorize"
+require "forwardable"
 require "GameState"
+require "Sound"
 
 require "utils/Event"
 
@@ -12,15 +14,22 @@ require "Menu/MainMenu"
 require "Menu/YouDeadMenu"
 require "Menu/ChooseSkillMenu"
 require "Menu/InspectingMenu"
+require "Menu/UserSettingsMenu"
 
 class Game
-    attr_reader :player_list, :enemies_list, :current_menu, :inspecting, :enemy_about_to_use
+    extend Forwardable
 
-    def initialize
-        @game_state = GameState.new()
+    attr_reader :player_list, :enemies_list, :current_menu, :inspecting, :enemy_about_to_use,
+        :player, :enemy, :volume, :is_use_audio
+
+    def_delegators :@game_state, :player, :enemy, :volume, :is_use_audio
+
+    def initialize(user_data_folder = "data/", audio_folder = "assets/sounds/")
+        @game_state = GameState.new(user_data_folder)
         @current_menu = MainMenu.new(self)
         @player_list = PlayersList.get_player_list
         @enemies_list = EnemiesList.get_enemies_list
+        @sound = Sound.new(audio_folder)
         @inspecting = nil
         @enemy_about_to_use = nil
 
@@ -74,6 +83,8 @@ class Game
             @game_state.logs.add_log("You have been slain!")
             @current_menu = YouDeadMenu.new(self)
         end)
+
+        @game_state.player.add_on_use_skill_listener(lambda{|skill, _| skill.sound_file != nil ? self.play_audio(skill.sound_file) : nil})
         
         self.register_new_enemy
 
@@ -89,13 +100,8 @@ class Game
     end
 
     def request_choose_player
+        @game_state.reset_state
         @current_menu = ChoosePlayerMenu.new(self)
-
-        self
-    end
-
-    def quit_game
-        @on_quit_game_listeners.emit()
 
         self
     end
@@ -112,18 +118,27 @@ class Game
             end
         )
 
+        @game_state.enemy.add_on_use_skill_listener(lambda{|skill, _| skill.sound_file != nil ? self.play_audio(skill.sound_file) : nil})
+
         self.decide_next_enemy_action
     end
 
-    # setters
-    def reset_game
-        @game_state.reset_state
+    def play_audio(filename)
+        if @game_state.is_use_audio
+            @sound.play_sound(filename, @game_state.volume)
+        end
+    end
 
-        self
+    def set_use_audio(is_use_audio)
+        @game_state.set_use_audio(is_use_audio)
+    end
+
+    def set_audio(volume)
+        @game_state.set_audio(volume)
     end
     
     def back_to_main_menu
-        self.reset_game
+        @game_state.reset_state
         @current_menu = MainMenu.new(self)
 
         self
@@ -147,8 +162,10 @@ class Game
         self
     end
 
-    def player
-        @game_state.player
+    def go_to_settings_menu
+        @current_menu = UserSettingsMenu.new(self)
+
+        self
     end
 
     def inspect_player
@@ -163,12 +180,14 @@ class Game
         @inspecting = nil
     end
 
-    def enemy
-        @game_state.enemy
-    end
-
     def logs
         @game_state.logs.logs
+    end
+
+    def quit_game
+        @on_quit_game_listeners.emit()
+
+        self
     end
 
     def add_on_quit_game_listener(listener)

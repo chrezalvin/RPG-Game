@@ -6,6 +6,7 @@ class HeavySwing < Skill
     @damage_multiplier = 2
     @description = "A classic heavy swing commonly used by warrior, uses #{@skill_mp_usage} mana, dealing #{@damage_multiplier}x of caster's Atk"
     @name = "Heavy Swing"
+    @sound_file = "sword_slice.mp3"
     def initialize(skill_owner)
         super(skill_owner)
     end
