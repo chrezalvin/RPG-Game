@@ -1,5 +1,5 @@
 require "colorize"
-require_relative "./Creature"
+require "Parents/Creature"
 
 class Heal
     attr_accessor :heal, :heal_type, :is_effect, :healer

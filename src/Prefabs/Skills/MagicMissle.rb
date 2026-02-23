@@ -1,5 +1,5 @@
-require_relative "../../Parents/Skill"
-require_relative "../Damages/SkillDamage"
+require "Parents/Skill"
+require "Damages/SkillDamage"
 
 class MagicMissle < Skill
 

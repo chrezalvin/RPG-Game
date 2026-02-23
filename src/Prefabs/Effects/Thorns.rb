@@ -1,5 +1,6 @@
-require_relative "../../Parents/Effect"
-require_relative "../Damages/EffectDamage"
+require "Parents/Effect"
+
+require "Damages/EffectDamage"
 
 class Thorns < Effect
     @damage_fraction_multiplier = 0.25

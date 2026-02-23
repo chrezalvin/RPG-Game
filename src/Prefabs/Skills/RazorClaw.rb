@@ -1,5 +1,5 @@
-require_relative "../../Parents/Skill"
-require_relative "../Damages/TrueDamage"
+require "Parents/Skill"
+require "Damages/TrueDamage"
 
 class RazorClaw < Skill
 

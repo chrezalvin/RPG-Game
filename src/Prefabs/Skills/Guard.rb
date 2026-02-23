@@ -1,5 +1,5 @@
-require_relative "../../Parents/Skill"
-require_relative "../Effects/Shielded"
+require "Parents/Skill"
+require "Effects/Shielded"
 
 class Guard < Skill
 

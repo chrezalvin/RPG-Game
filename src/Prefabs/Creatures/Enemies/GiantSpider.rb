@@ -1,6 +1,7 @@
-require_relative "../../Skills/BasicAttack"
-require_relative "../../Skills/AcrobaticSlash"
-require_relative "../../../Parents/Creature"
+require "Parents/Creature"
+
+require "Skills/BasicAttack"
+require "Skills/AcrobaticSlash"
 
 class GiantSpider < Creature
     @description = nil

@@ -1,53 +1,44 @@
 require "io/console"
+require "utils/Event"
 
 class UserInput
-    def initialize(
-        up_listeners = [],
-        down_listeners = [],
-        left_listeners = [],
-        right_listeners = [],
-        enter_listeners = []
-    )
-        @listen_up = up_listeners
-        @listen_down = down_listeners
-        @listen_left = left_listeners
-        @listen_right = right_listeners
-        @listen_enter = enter_listeners
+    def initialize()
+        @listen_up = Event.new()
+        @listen_down = Event.new()
+        @listen_left = Event.new()
+        @listen_right = Event.new()
+        @listen_enter = Event.new()
     end
 
     def register_up_listener(fcn)
-        @listen_up.push(fcn)
+        @listen_up.subscribe(fcn)
     end
 
     def register_down_listener(fcn)
-        @listen_down.push(fcn)
+        @listen_down.subscribe(fcn)
     end
 
     def register_left_listener(fcn)
-        @listen_left.push(fcn)
+        @listen_left.subscribe(fcn)
     end
 
     def register_right_listener(fcn)
-        @listen_right.push(fcn)
+        @listen_right.subscribe(fcn)
     end
 
     def register_enter_listener(fcn)
-        @listen_enter.push(fcn)
-    end
-
-    private def trigger_all_fcn_in_array(fcns)
-        fcns.each{|fcn| fcn.call}
+        @listen_enter.subscribe(fcn)
     end
 
     def get_arrow_input
         user_input = STDIN.getch
 
         if user_input.bytes == [224, 80]
-            trigger_all_fcn_in_array(@listen_down)
+            @listen_down.emit()
         elsif user_input.bytes == [224, 72]
-            trigger_all_fcn_in_array(@listen_up)
+            @listen_up.emit()
         elsif user_input.bytes == [13]
-            trigger_all_fcn_in_array(@listen_enter)
+            @listen_enter.emit()
         end
     end
 end

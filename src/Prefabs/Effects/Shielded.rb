@@ -1,13 +1,14 @@
-require_relative "../../Parents/Effect"
-require_relative "../Damages/EffectDamage"
+require "Parents/Effect"
+
+require "Damages/EffectDamage"
 
 class Shielded < Effect
-    @damage_reduction_multiplier = 0.75
+    @damage_reduction_multiplier = 0.5
     @name = "Shielded"
     @description = "Reduces the next damage taken by #{@damage_reduction_multiplier * 100}%"
-    def initialize()
+    def initialize(stack = 1)
         super()
-        @is_used = false
+        @stack = stack
     end
 
     def self.damage_reduction_multiplier
@@ -18,13 +19,15 @@ class Shielded < Effect
         super(damage)
 
         damage.damage = (damage.damage * self.class.damage_reduction_multiplier).to_i
-        @is_used = true
 
+        @stack -= 1
 
-        @effect_owner.cleanup_expired_effects
+        if self.is_expired?
+            @effect_owner.cleanup_expired_effects
+        end
     end
 
     def is_expired?
-        @is_used
+        @stack <= 0
     end
 end

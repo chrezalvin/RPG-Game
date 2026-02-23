@@ -1,4 +1,4 @@
-require_relative "../../Parents/Heal"
+require "Parents/Heal"
 
 class BasicHeal < Heal
     def initialize(heal_amount, healer)

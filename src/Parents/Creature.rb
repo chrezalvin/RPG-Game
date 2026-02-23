@@ -1,17 +1,17 @@
 require "forwardable"
-
-require_relative "./Stats/Hp"
-require_relative "./Stats/Mp"
-require_relative "./Stats/Atk"
-require_relative "./Stats/Matk"
-require_relative "./Stats/NaturalMpRegen"
-require_relative "./Stats/NaturalHpRegen"
-require_relative "./Damage"
-require_relative "./Heal"
-require_relative "./Effect"
-
-require_relative "./Skill"
 require "colorize"
+
+require "utils/Event"
+require "Parents/Stats/Hp"
+require "Parents/Stats/Mp"
+require "Parents/Stats/Atk"
+require "Parents/Stats/Matk"
+require "Parents/Stats/NaturalMpRegen"
+require "Parents/Stats/NaturalHpRegen"
+require "Parents/Damage"
+require "Parents/Heal"
+require "Parents/Effect"
+require "Parents/Skill"
 
 # Creature class
 class Creature
@@ -85,9 +85,9 @@ class Creature
       @usable_skills = []
       @effects = []
 
-      @use_skill_listeners = []
-      @on_effect_applied_listeners = []
-      @on_effect_expired_listeners = []
+      @use_skill_listeners = Event.new()
+      @on_effect_applied_listeners = Event.new()
+      @on_effect_expired_listeners = Event.new()
     end
 
     def take_damage(damage)
@@ -130,7 +130,7 @@ class Creature
         if (target.is_a? Creature) && (@basic_attack != nil)
           
           @effects.each{|effect| effect.on_before_use_skill(@basic_attack, target)}
-          @use_skill_listeners.each{|listener| listener.call(@basic_attack, target)}
+          @use_skill_listeners.emit(@basic_attack, target)
           
           @basic_attack.use_skill(target)
 
@@ -151,7 +151,7 @@ class Creature
       if skill.can_use_skill?(target)
         @effects.each{|effect| effect.on_before_use_skill(skill, target)}
 
-        @use_skill_listeners.each{|listener| listener.call(skill, target)}
+        @use_skill_listeners.emit(skill, target)
         skill.use_skill(target)
 
         @effects.each{|effect| effect.on_after_use_skill(skill, target)}
@@ -165,7 +165,7 @@ class Creature
       if skill.can_use_skill?(target)
         @effects.each{|effect| effect.on_before_use_skill(skill, target)}
 
-        @use_skill_listeners.each{|listener| listener.call(skill, target)}
+        @use_skill_listeners.emit(skill, target)
         skill.use_skill(target)
 
         @effects.each{|effect| effect.on_after_use_skill(skill, target)}
@@ -177,7 +177,7 @@ class Creature
 
       @effects.push(effect)
 
-      @on_effect_applied_listeners.each{|listener| listener.call(effect)}
+      @on_effect_applied_listeners.emit(effect)
     end
 
     def cleanup_expired_effects
@@ -185,7 +185,7 @@ class Creature
       @effects.reject!{|effect| effect.is_expired?}
 
       expired_effects.each do |effect|
-        @on_effect_expired_listeners.each{|listener| listener.call(effect)}
+        @on_effect_expired_listeners.emit(effect)
       end
     end
 
@@ -200,14 +200,14 @@ class Creature
     end
 
     def add_on_use_skill_listener(listener)
-      @use_skill_listeners.push(listener)  
+      @use_skill_listeners.subscribe(listener)
     end
 
     def add_on_effect_applied_listener(listener)
-      @on_effect_applied_listeners.push(listener)
+      @on_effect_applied_listeners.subscribe(listener)
     end
 
     def add_on_effect_expired_listener(listener)
-      @on_effect_expired_listeners.push(listener)
+      @on_effect_expired_listeners.subscribe(listener)
     end
 end

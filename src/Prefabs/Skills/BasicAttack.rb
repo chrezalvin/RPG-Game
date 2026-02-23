@@ -1,5 +1,5 @@
-require_relative "../../Parents/Skill"
-require_relative "../Damages/BasicDamage"
+require "Parents/Skill"
+require "Damages/BasicDamage"
 
 class BasicAttack < Skill
 

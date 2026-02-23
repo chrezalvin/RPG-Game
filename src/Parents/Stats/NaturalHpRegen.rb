@@ -1,4 +1,4 @@
-require_relative "./Hp"
+require "Parents/Stats/Hp"
 
 class NaturalHpRegen
   attr_reader :natural_hp_regen

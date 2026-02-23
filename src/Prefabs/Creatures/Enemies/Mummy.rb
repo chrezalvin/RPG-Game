@@ -1,7 +1,9 @@
-require_relative "../../Skills/BasicAttack"
-require_relative "../../Skills/Curse"
-require_relative "../../../Parents/Creature"
-require_relative "../../Damages/BasicDamage"
+require "Parents/Creature"
+
+require "Skills/BasicAttack"
+require "Skills/Curse"
+require "Damages/BasicDamage"
+
 
 class Mummy < Creature
     @name = "Mummy"

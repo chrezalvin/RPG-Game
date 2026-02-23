@@ -6,12 +6,10 @@ require_relative "./Logs"
 
 class GameState
     attr_reader :player, :enemy, :current_menu, :logs
-    attr_accessor :flag_exit
     def initialize
         @player = nil
         @enemy = nil
         @logs = Logs.new()
-        @flag_exit = false
     end
 
     def set_logs(logs)

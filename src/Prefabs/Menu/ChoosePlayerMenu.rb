@@ -1,9 +1,10 @@
-require_relative "../../Parents/Menu"
-require_relative "../../Parents/MenuElement"
-require_relative "../../Parents/Creature"
-require_relative "../../Game"
-require_relative "./playMenu"
-require_relative "../Creatures/Players/index"
+require "Game"
+
+require "Parents/Menu"
+require "Parents/MenuElement"
+require "Parents/Creature"
+
+require "Creatures/Players/index"
 
 class ChoosePlayerMenu < Menu
     def initialize(game)

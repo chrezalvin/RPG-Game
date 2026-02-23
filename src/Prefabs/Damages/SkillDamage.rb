@@ -1,4 +1,4 @@
-require_relative "../../Parents/Damage"
+require "Parents/Damage"
 
 class SkillDamage < Damage
     def initialize(amount, damage_dealer)

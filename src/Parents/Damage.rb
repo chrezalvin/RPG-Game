@@ -1,5 +1,5 @@
 require "colorize"
-require_relative "./Creature"
+require "Parents/Creature"
 
 class Damage
     attr_accessor :damage, :damage_type, :is_effect, :damage_dealer

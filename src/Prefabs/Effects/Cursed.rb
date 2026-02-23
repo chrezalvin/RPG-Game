@@ -1,13 +1,12 @@
-require_relative "../../Parents/Effect"
+require "Parents/Effect"
 
 class Cursed < Effect
-    
     @heal_reduction_multiplier = 0.5
     @name = "Cursed"
     @description = "Reduce the next heal received by #{@heal_reduction_multiplier * 100}%"
-    def initialize()
+    def initialize(stack = 1)
         super()
-        @is_used = false
+        @stack = stack
     end
 
     def self.heal_reduction_multiplier
@@ -19,12 +18,30 @@ class Cursed < Effect
 
         heal_instance.heal = (heal_instance.heal * (100 - self.class.heal_reduction_multiplier) / 100).to_i
 
-        @is_used = true
+        @stack -= 1
 
-        @effect_owner.cleanup_expired_effects
+        if self.is_expired?
+            @effect_owner.cleanup_expired_effects
+        end
+    end
+
+    def apply_effect(creature)
+        throw "creature must be an instance of Creature, got #{creature.class}" unless creature.is_a? Creature
+
+        # find if the creature already has this effect
+        existing_effect = creature.effects.find{|effect| effect.class == self.class}
+
+        if existing_effect
+            # if the creature already has this effect, refresh the effect
+            existing_effect.stack = existing_effect.stack + self.stack
+        else
+            # if the creature does not have this effect, apply the effect as normal
+            creature.apply_effect(self)
+            @effect_owner = creature
+        end
     end
 
     def is_expired?
-        @is_used
+        @stack <= 0
     end
 end

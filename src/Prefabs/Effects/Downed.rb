@@ -1,5 +1,6 @@
-require_relative "../../Parents/Effect"
-require_relative "../Damages/EffectDamage"
+require "Parents/Effect"
+
+require "Damages/EffectDamage"
 
 class Shielded < Effect
     @damage_increase_multiplier = 0.5

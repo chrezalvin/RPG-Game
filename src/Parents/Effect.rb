@@ -1,8 +1,11 @@
-require_relative "./Damage"
-require_relative "./Creature"
-require_relative "./Heal"
+require "Parents/Damage"
+require "Parents/Creature"
+require "Parents/Heal"
 
 class Effect
+    attr_reader :effect_owner
+    attr_accessor :stack
+
     class << self
         attr_reader :name, :description
     end
@@ -11,6 +14,7 @@ class Effect
     @description = "unknown description"
     def initialize
         @effect_owner = nil
+        @stack = nil
     end
 
     def on_before_take_damage(damage)
