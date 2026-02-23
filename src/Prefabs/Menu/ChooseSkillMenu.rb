@@ -1,6 +1,7 @@
 require "colorize"
-require_relative "../../Parents/Menu"
-require_relative "../../Parents/MenuElement"
+
+require "Parents/Menu"
+require "Parents/MenuElement"
 
 class ChooseSkillMenu < Menu
   def initialize(game)

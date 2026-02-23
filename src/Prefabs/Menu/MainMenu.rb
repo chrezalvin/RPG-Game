@@ -1,6 +1,7 @@
-require_relative "../../Game"
-require_relative "../../Parents/Menu"
-require_relative "../../Parents/MenuElement"
+require "Game"
+
+require "Parents/Menu"
+require "Parents/MenuElement"
 
 class MainMenu < Menu
     def initialize(game)

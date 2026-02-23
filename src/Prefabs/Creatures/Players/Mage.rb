@@ -1,9 +1,10 @@
-require_relative "../../../Parents/Creature"
-require_relative "../../Skills/HighHeal"
-require_relative "../../Skills/BasicHealing"
-require_relative "../../Skills/MagicMissle"
-require_relative "../../Skills/MagicArrows"
-require_relative "../../Skills/BasicAttack"
+require "Parents/Creature"
+
+require "Skills/HighHeal"
+require "Skills/BasicHealing"
+require "Skills/MagicMissle"
+require "Skills/MagicArrows"
+require "Skills/BasicAttack"
 
 class Mage < Creature
 

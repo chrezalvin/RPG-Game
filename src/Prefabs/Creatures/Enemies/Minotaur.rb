@@ -1,6 +1,7 @@
-require_relative "../../Skills/BasicAttack"
-require_relative "../../Skills/HeavySwing"
-require_relative "../../../Parents/Creature"
+require "Parents/Creature"
+
+require "Skills/BasicAttack"
+require "Skills/HeavySwing"
 
 class Minotaur < Creature
     @name = "Minotaur"

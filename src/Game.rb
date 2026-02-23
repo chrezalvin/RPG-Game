@@ -1,13 +1,17 @@
-require_relative "./GameState"
-require_relative "./Prefabs/Creatures/Players/index"
-require_relative "./Prefabs/Creatures/Enemies/index"
-require_relative "./Prefabs/Menu/ChoosePlayerMenu"
-require_relative "./Prefabs/Menu/PlayMenu"
-require_relative "./Prefabs/Menu/MainMenu"
-require_relative "./Prefabs/Menu/YouDeadMenu"
-require_relative "./Prefabs/Menu/ChooseSkillMenu"
-require_relative "./Prefabs/Menu/InspectingMenu"
 require "colorize"
+require "GameState"
+
+require "utils/Event"
+
+require "Creatures/Players/index"
+require "Creatures/Enemies/index"
+
+require "Menu/ChoosePlayerMenu"
+require "Menu/PlayMenu"
+require "Menu/MainMenu"
+require "Menu/YouDeadMenu"
+require "Menu/ChooseSkillMenu"
+require "Menu/InspectingMenu"
 
 class Game
     attr_reader :player_list, :enemies_list, :current_menu, :inspecting, :enemy_about_to_use
@@ -19,6 +23,8 @@ class Game
         @enemies_list = EnemiesList.get_enemies_list
         @inspecting = nil
         @enemy_about_to_use = nil
+
+        @on_quit_game_listeners = Event.new()
     end
 
     def initiate_skill(skill_idx)
@@ -29,9 +35,9 @@ class Game
                 self.register_new_enemy
             else
                 self.trigger_enemy_attack
+                self.decide_next_enemy_action
             end
 
-            self.decide_next_enemy_action
         end
     end
 
@@ -43,9 +49,9 @@ class Game
                 self.register_new_enemy
             else
                 self.trigger_enemy_attack
+                self.decide_next_enemy_action
             end
 
-            self.decide_next_enemy_action
         end
     end
 
@@ -63,6 +69,7 @@ class Game
         @game_state.player.add_on_use_skill_listener(lambda{|skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")})
         @game_state.player.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")})
         @game_state.player.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")})
+        @game_state.player.add_on_heal_listener(lambda{|heal_instance| @game_state.logs.add_log("You healed #{heal_instance.amount_colorized} HP")})
         @game_state.player.add_on_dead_listener(lambda do 
             @game_state.logs.add_log("You have been slain!")
             @current_menu = YouDeadMenu.new(self)
@@ -88,7 +95,7 @@ class Game
     end
 
     def quit_game
-        @game_state.flag_exit = true
+        @on_quit_game_listeners.emit()
 
         self
     end
@@ -99,6 +106,7 @@ class Game
         @game_state.enemy.add_on_use_skill_listener(lambda{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized}")})
         @game_state.enemy.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is affected by #{effect.name_colorized}")})
         @game_state.enemy.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")})
+        @game_state.enemy.add_on_heal_listener(lambda{|heal_instance| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} healed #{heal_instance.amount_colorized} HP")})
         @game_state.enemy.add_on_dead_listener(lambda do 
                 @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")
             end
@@ -159,11 +167,11 @@ class Game
         @game_state.enemy
     end
 
-    def flag_exit
-        @game_state.flag_exit
-    end
-
     def logs
         @game_state.logs.logs
+    end
+
+    def add_on_quit_game_listener(listener)
+        @on_quit_game_listeners.subscribe(listener)
     end
 end

@@ -1,5 +1,5 @@
-require_relative "../../Parents/Skill"
-require_relative "../Heal/BasicHeal"
+require "Parents/Skill"
+require "Heal/BasicHeal"
 
 class BasicHealing < Skill
   @skill_mp_usage = 10

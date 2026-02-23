@@ -1,5 +1,5 @@
-require_relative "./Creature"
 require "colorize"
+require "Parents/Creature"
 
 class Skill
     attr_reader :name, :damage, :description
@@ -11,12 +11,9 @@ class Skill
     @name = "unknown skill"
     @description = "unknown description"
     def initialize(skill_owner)
-        
-        if skill_owner.is_a? Creature
-            @skill_owner = skill_owner
-        else
-            throw "invalid skill owner! skill owner is a #{skill_owner.inspect}"
-        end
+        throw "skill owner must be a Creature, got #{skill_owner.class}" unless skill_owner.is_a? Creature
+
+        @skill_owner = skill_owner
     end
 
     def name

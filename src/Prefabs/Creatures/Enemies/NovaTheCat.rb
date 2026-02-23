@@ -1,6 +1,7 @@
-require_relative "../../Skills/BasicAttack"
-require_relative "../../Skills/RazorClaw"
-require_relative "../../../Parents/Creature"
+require "Parents/Creature"
+
+require "Skills/BasicAttack"
+require "Skills/RazorClaw"
 
 class NovaTheCat < Creature
     @name = "Nova the Cat"

@@ -1,4 +1,4 @@
-require_relative "./Mp"
+require "Parents/Stats/Mp"
 
 class NaturalMpRegen
   attr_reader :natural_mp_regen

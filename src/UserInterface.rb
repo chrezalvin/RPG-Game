@@ -1,9 +1,10 @@
-require_relative "./Parents/MenuElement"
-require_relative "./Parents/Menu"
-require_relative "./Logs"
-require_relative "./Game"
-require_relative "./Parents/Creature"
+require "Logs"
+require "Game"
 require "colorize"
+
+require "Parents/MenuElement"
+require "Parents/Menu"
+require "Parents/Creature"
 
 class UserInterface
     @@initial_box_width = 94

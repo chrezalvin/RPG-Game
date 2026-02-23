@@ -1,9 +1,10 @@
-require_relative "../../../Parents/Creature"
-require_relative "../../Skills/HeavySwing"
-require_relative "../../Skills/BasicAttack"
-require_relative "../../Skills/BasicHealing"
-require_relative "../../Skills/Guard"
-require_relative "../../Effects/Thorns"
+require "Parents/Creature"
+
+require "Skills/HeavySwing"
+require "Skills/BasicAttack"
+require "Skills/BasicHealing"
+require "Skills/Guard"
+require "Effects/Thorns"
 
 class Viking < Creature
 

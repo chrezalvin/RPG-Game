@@ -1,4 +1,4 @@
-require_relative "./MenuElement"
+require "Parents/MenuElement"
 
 class Menu
     attr_reader :selected_idx
