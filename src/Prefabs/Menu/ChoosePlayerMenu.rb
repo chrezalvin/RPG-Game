@@ -10,7 +10,14 @@ class ChoosePlayerMenu < Menu
     def initialize(game)
         super()
         @menu_list = PlayersList.get_player_list.map{
-            |player| MenuElement.new(player.name, lambda{game.play_game(player)}, player.description == nil ? nil : player.description)
-        }.push(MenuElement.new("Back to Main Menu", lambda{game.back_to_main_menu}))
+            |player| MenuElement.new(
+                menu_name: player.name, 
+                on_selected: lambda{game.play_game(player)}, 
+                tooltip: player.description == nil ? nil : player.description
+            )
+        }.push(MenuElement.new(
+            menu_name: "Back to Main Menu", 
+            on_selected: lambda{game.back_to_main_menu}
+        ))
     end
 end

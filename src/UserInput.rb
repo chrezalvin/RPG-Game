@@ -39,6 +39,10 @@ class UserInput
             @listen_up.emit()
         elsif user_input.bytes == [13]
             @listen_enter.emit()
+        elsif user_input.bytes == [224, 77]
+            @listen_right.emit()
+        elsif user_input.bytes == [224, 75]
+            @listen_left.emit()
         end
     end
 end
