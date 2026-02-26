@@ -4,7 +4,7 @@ require "utils/GameData"
 class GameSettings
     @@default_user_settings = {
         "use_audio": true,
-        "preferred_volume": 1.0
+        "preferred_volume_percentage": 100
     }
     def initialize(user_settings_file)
         @game_data = GameData.new(user_settings_file, @@default_user_settings)
@@ -24,11 +24,11 @@ class GameSettings
     end
 
     def set_preferred_volume(volume)
-        throw "Error: Volume must be between 0.0 and 1.0" if volume < 0.0 || volume > 1.0
-        @game_data.set_game_data("preferred_volume", volume)
+        throw "Error: Volume must be between 0 and 100" if volume < 0 || volume > 100
+        @game_data.set_game_data("preferred_volume_percentage", volume)
     end
 
     def preferred_volume
-        return @game_data.game_data["preferred_volume"]
+        return @game_data.game_data["preferred_volume_percentage"]
     end
 end
