@@ -22,9 +22,9 @@ class Creature
       attr_reader :description, :name
   end
 
-    attr_reader :name, :usable_skills, :basic_attack, :effects,
-      :current_hp, :max_hp, :add_on_heal_listener, :add_on_get_hit_listener, :add_on_dead_listener, :add_on_hp_changed_listener,
-      :current_mp, :max_mp, :add_on_mp_used_listener, :add_on_mp_added_listener, :add_on_mp_changed_listener,
+    attr_reader :name, :usable_skills, :basic_attack, :effects, :on_use_skill, :on_effect_applied, :on_effect_expired,
+      :current_hp, :max_hp, :on_heal, :on_get_hit, :on_dead, :on_hp_changed,
+      :current_mp, :max_mp, :on_mp_used, :on_mp_added, :on_mp_changed,
       :atk_amount, :atk_colorized, 
       :matk_amount, :matk_colorized,
       :natural_hp_regen,
@@ -35,22 +35,26 @@ class Creature
       :current_hp_colorized, 
       :max_hp_colorized, 
       :max_hp, 
-      :add_on_heal_listener, 
-      :add_on_get_hit_listener, 
-      :add_on_dead_listener, 
-      :add_on_hp_changed_listener
+      :on_take_damage, 
+      :on_heal,
+      :on_dead, 
+      :on_hp_changed
     def_delegators :@mp, 
       :current_mp, 
       :current_mp_colorized, 
       :max_mp_colorized, 
       :max_mp, 
-      :add_on_mp_used_listener, 
-      :add_on_mp_added_listener, 
-      :add_on_mp_changed_listener
+      :on_mp_used, 
+      :on_mp_added, 
+      :on_mp_changed
     def_delegators :@atk, :atk_amount, :atk_colorized
     def_delegators :@matk, :matk_amount, :matk_colorized
     def_delegators :@nhpr, :natural_hp_regen
     def_delegators :@nmpr, :natural_mp_regen
+
+    def_delegator :@use_skill_listeners, :subscribe, :on_use_skill
+    def_delegator :@on_effect_applied_listeners, :subscribe, :on_effect_applied
+    def_delegator :@on_effect_expired_listeners, :subscribe, :on_effect_expired
 
     def name
       self.class.name
@@ -197,17 +201,5 @@ class Creature
 
     def is_dead?
       @hp.is_dead?
-    end
-
-    def add_on_use_skill_listener(listener)
-      @use_skill_listeners.subscribe(listener)
-    end
-
-    def add_on_effect_applied_listener(listener)
-      @on_effect_applied_listeners.subscribe(listener)
-    end
-
-    def add_on_effect_expired_listener(listener)
-      @on_effect_expired_listeners.subscribe(listener)
     end
 end

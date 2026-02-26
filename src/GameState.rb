@@ -9,13 +9,14 @@ require "Creatures/Enemies/Minotaur"
 require "Menu/MainMenu"
 
 class GameState
-    attr_reader :player, :enemy, :current_menu, :logs, :volume, :is_use_audio
+    attr_reader :player, :enemy, :current_menu, :logs, :volume, :is_use_audio, :inspecting
     def initialize(user_data_folder)
         @game_settings = GameSettings.new(user_data_folder + "settings.json")
         @user_data = UserData.new(user_data_folder + "user_data.json")
         
         @player = nil
         @enemy = nil
+        @inspecting = nil
         @logs = Logs.new()
 
         @volume = @game_settings.preferred_volume
@@ -46,6 +47,18 @@ class GameState
 
             @logs.add_log("You choose #{player.name_colorized}")
         end
+    end
+
+    def inspect_player
+        @inspecting = @player
+    end
+
+    def inspect_enemy
+        @inspecting = @enemy
+    end
+
+    def clear_inspecting
+        @inspecting = nil
     end
 
     def set_audio(volume)

@@ -19,10 +19,12 @@ require "Menu/UserSettingsMenu"
 class Game
     extend Forwardable
 
-    attr_reader :player_list, :enemies_list, :current_menu, :inspecting, :enemy_about_to_use,
-        :player, :enemy, :volume, :is_use_audio
+    attr_reader :player_list, :enemies_list, :current_menu, :inspecting, :enemy_about_to_use, :on_quit_game,
+        :player, :enemy, :volume, :is_use_audio, :inspecting, :inspecting_player, :inspecting_enemy, :clear_inspecting
 
-    def_delegators :@game_state, :player, :enemy, :volume, :is_use_audio
+    def_delegators :@game_state, :player, :enemy, :volume, :is_use_audio, :inspecting, :inspect_player, :inspect_enemy, :clear_inspecting
+
+    def_delegator :@on_quit_game_listeners, :subscribe, :on_quit_game
 
     def initialize(user_data_folder = "data/", audio_folder = "assets/sounds/")
         @game_state = GameState.new(user_data_folder)
@@ -30,7 +32,6 @@ class Game
         @player_list = PlayersList.get_player_list
         @enemies_list = EnemiesList.get_enemies_list
         @sound = Sound.new(audio_folder)
-        @inspecting = nil
         @enemy_about_to_use = nil
 
         @on_quit_game_listeners = Event.new()
@@ -46,7 +47,6 @@ class Game
                 self.trigger_enemy_attack
                 self.decide_next_enemy_action
             end
-
         end
     end
 
@@ -74,17 +74,17 @@ class Game
     def play_game(player)
         @game_state.set_player(player.new())
 
-        @game_state.player.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("you received #{damage.amount_colorized} #{damage.damage_type} damage")})
-        @game_state.player.add_on_use_skill_listener(lambda{|skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")})
-        @game_state.player.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")})
-        @game_state.player.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")})
-        @game_state.player.add_on_heal_listener(lambda{|heal_instance| @game_state.logs.add_log("You healed #{heal_instance.amount_colorized} HP")})
-        @game_state.player.add_on_dead_listener(lambda do 
+        @game_state.player.on_take_damage{|damage| @game_state.logs.add_log("you received #{damage.amount_colorized} #{damage.damage_type} damage")}
+        @game_state.player.on_use_skill{|skill, enemy| @game_state.logs.add_log("You used #{skill.name_colorized} on #{enemy.name_colorized}")}
+        @game_state.player.on_effect_applied{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")}
+        @game_state.player.on_effect_expired{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")}
+        @game_state.player.on_heal(lambda{|heal_instance| @game_state.logs.add_log("You healed #{heal_instance.amount_colorized} HP")})
+        @game_state.player.on_dead(lambda do 
             @game_state.logs.add_log("You have been slain!")
             @current_menu = YouDeadMenu.new(self)
         end)
 
-        @game_state.player.add_on_use_skill_listener(lambda{|skill, _| skill.sound_file != nil ? self.play_audio(skill.sound_file) : nil})
+        @game_state.player.on_use_skill{|skill, _| skill.sound_file != nil ? self.play_audio(skill.sound_file) : nil}
         
         self.register_new_enemy
 
@@ -108,17 +108,15 @@ class Game
 
     def register_new_enemy
         @game_state.set_enemy(@enemies_list.sample.new())
-        @game_state.enemy.add_on_get_hit_listener(lambda{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.amount_colorized} #{damage.damage_type} damage")})
-        @game_state.enemy.add_on_use_skill_listener(lambda{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized}")})
-        @game_state.enemy.add_on_effect_applied_listener(lambda{|effect| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is affected by #{effect.name_colorized}")})
-        @game_state.enemy.add_on_effect_expired_listener(lambda{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")})
-        @game_state.enemy.add_on_heal_listener(lambda{|heal_instance| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} healed #{heal_instance.amount_colorized} HP")})
-        @game_state.enemy.add_on_dead_listener(lambda do 
-                @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")
-            end
-        )
 
-        @game_state.enemy.add_on_use_skill_listener(lambda{|skill, _| skill.sound_file != nil ? self.play_audio(skill.sound_file) : nil})
+        @game_state.enemy.on_take_damage{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.amount_colorized} #{damage.damage_type} damage")}
+        @game_state.enemy.on_use_skill{|skill, player| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized}")}
+        @game_state.enemy.on_effect_applied{|effect| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is affected by #{effect.name_colorized}")}
+        @game_state.enemy.on_effect_expired{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")}
+        @game_state.enemy.on_heal{|heal_instance| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} healed #{heal_instance.amount_colorized} HP")}
+        @game_state.enemy.on_dead{ @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")}
+
+        @game_state.enemy.on_use_skill{|skill, _| skill.sound_file != nil ? self.play_audio(skill.sound_file) : nil}
 
         self.decide_next_enemy_action
     end
@@ -168,18 +166,6 @@ class Game
         self
     end
 
-    def inspect_player
-        @inspecting = @game_state.player
-    end
-
-    def inspect_enemy
-        @inspecting = @game_state.enemy
-    end
-
-    def clear_inspecting
-        @inspecting = nil
-    end
-
     def logs
         @game_state.logs.logs
     end
@@ -188,9 +174,5 @@ class Game
         @on_quit_game_listeners.emit()
 
         self
-    end
-
-    def add_on_quit_game_listener(listener)
-        @on_quit_game_listeners.subscribe(listener)
     end
 end

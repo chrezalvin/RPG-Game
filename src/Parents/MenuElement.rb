@@ -1,10 +1,12 @@
+require "utils/Event"
+
 class MenuElement
     attr_reader :menu_name, :tooltip
     def initialize(
             menu_name: "Unknown Menu", 
-            on_selected: nil, 
             tooltip: nil, 
             on_hover: nil,
+            on_selected: nil,
             on_select_right: nil,
             on_select_left: nil
         )

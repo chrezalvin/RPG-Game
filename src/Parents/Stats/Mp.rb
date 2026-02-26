@@ -1,7 +1,13 @@
+require "forwardable"
+
 require "utils/Event"
 
-class Mp
-  attr_reader :current_mp, :max_mp
+class Mp extend Forwardable
+  attr_reader :current_mp, :max_mp, :on_mp_used, :on_mp_added, :on_mp_changed
+
+  def_delegator :@on_mp_used_listeners, :subscribe, :on_mp_used
+  def_delegator :@on_mp_added_listeners, :subscribe, :on_mp_added
+  def_delegator :@on_mp_changed_listeners, :subscribe, :on_mp_changed
 
   @@initial_mp = 100
   @@initial_max_mp = 100
@@ -32,18 +38,6 @@ class Mp
     @current_mp = @current_mp - amount
 
     @on_mp_changed_listeners.emit(@current_mp)
-  end
-
-  def add_on_mp_used_listener(listener)
-    @on_mp_used_listeners.subscribe(listener)
-  end
-
-  def add_on_mp_added_listener(listener)
-    @on_mp_added_listeners.subscribe(listener)
-  end
-
-  def add_on_mp_changed_listener(listener)
-    @on_mp_changed_listeners.subscribe(listener)
   end
 
   def current_mp_colorized

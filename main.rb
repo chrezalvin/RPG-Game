@@ -29,12 +29,13 @@ if __FILE__ == $0
     user_input = UserInput.new()
     flag_exit = false
 
-    user_input.register_up_listener(lambda {game.current_menu.focus_prev_element; game.play_audio(select_sound_file)})
-    user_input.register_down_listener(lambda {game.current_menu.focus_next_element; game.play_audio(select_sound_file)})
-    user_input.register_enter_listener(lambda {game.current_menu.select_current_element; game.play_audio(select_sound_file)})
-    user_input.register_right_listener(lambda {game.current_menu.select_right_current_element; game.play_audio(select_sound_file)})
-    user_input.register_left_listener(lambda {game.current_menu.select_left_current_element; game.play_audio(select_sound_file)})
-    game.add_on_quit_game_listener(lambda {flag_exit = true})
+    user_input.on_up{game.current_menu.focus_prev_element}
+    user_input.on_down{game.current_menu.focus_next_element}
+    user_input.on_enter{game.current_menu.select_current_element}
+    user_input.on_right{game.current_menu.select_right_current_element}
+    user_input.on_left{game.current_menu.select_left_current_element}
+
+    game.on_quit_game{flag_exit = true}
 
     until flag_exit == true
         system("clear") || system("cls")
