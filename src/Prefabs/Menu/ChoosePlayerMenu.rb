@@ -2,14 +2,14 @@ require "Game"
 
 require "Parents/Menu"
 require "Parents/MenuElement"
-require "Parents/Creature"
-
-require "Creatures/Players/index"
 
 class ChoosePlayerMenu < Menu
     def initialize(game)
+        throw "Error: game is not a Game object" unless game.is_a? Game
         super()
-        @menu_list = PlayersList.get_player_list.map{
+
+
+        @menu_list = game.player_list.map{
             |player| MenuElement.new(
                 menu_name: player.name, 
                 on_selected: lambda{game.play_game(player)}, 

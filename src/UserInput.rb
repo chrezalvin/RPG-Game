@@ -1,33 +1,23 @@
+require "forwardable"
+
 require "io/console"
 require "utils/Event"
 
-class UserInput
+class UserInput extend Forwardable
+    attr_reader :on_up, :on_down, :on_left, :on_right, :on_enter
+
+    def_delegator :@listen_up, :subscribe, :on_up
+    def_delegator :@listen_down, :subscribe, :on_down
+    def_delegator :@listen_left, :subscribe, :on_left
+    def_delegator :@listen_right, :subscribe, :on_right
+    def_delegator :@listen_enter, :subscribe, :on_enter
+
     def initialize()
         @listen_up = Event.new()
         @listen_down = Event.new()
         @listen_left = Event.new()
         @listen_right = Event.new()
         @listen_enter = Event.new()
-    end
-
-    def register_up_listener(fcn)
-        @listen_up.subscribe(fcn)
-    end
-
-    def register_down_listener(fcn)
-        @listen_down.subscribe(fcn)
-    end
-
-    def register_left_listener(fcn)
-        @listen_left.subscribe(fcn)
-    end
-
-    def register_right_listener(fcn)
-        @listen_right.subscribe(fcn)
-    end
-
-    def register_enter_listener(fcn)
-        @listen_enter.subscribe(fcn)
     end
 
     def get_arrow_input

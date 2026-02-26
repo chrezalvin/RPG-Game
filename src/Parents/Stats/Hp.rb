@@ -1,10 +1,17 @@
+require "forwardable"
+
 require "Parents/Damage"
 require "Parents/Heal"
 
 require "utils/Event"
 
-class Hp
-  attr_reader :current_hp, :max_hp
+class Hp extend Forwardable
+  attr_reader :current_hp, :max_hp, :on_take_damage, :on_heal, :on_dead, :on_hp_changed
+
+  def_delegator :@on_take_damage_listeners, :subscribe, :on_take_damage
+  def_delegator :@on_heal_listeners, :subscribe, :on_heal
+  def_delegator :@on_dead_listeners, :subscribe, :on_dead
+  def_delegator :@on_hp_changed_listeners, :subscribe, :on_hp_changed
 
   @@initial_hp = 100
   @@initial_max_hp = 100
@@ -45,22 +52,6 @@ class Hp
 
   def is_dead?
     @current_hp <= 0
-  end
-
-  def add_on_get_hit_listener(listener)
-    @on_take_damage_listeners.subscribe(listener)
-  end
-
-  def add_on_heal_listener(listener)
-    @on_heal_listeners.subscribe(listener)
-  end
-
-  def add_on_dead_listener(listener)
-    @on_dead_listeners.subscribe(listener)
-  end
-
-  def add_on_hp_changed_listener(listener)
-    @on_hp_changed_listeners.subscribe(listener)
   end
 
   def current_hp_colorized
