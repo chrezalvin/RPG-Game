@@ -26,7 +26,5 @@ class InspectingMenu < Menu
             on_selected: lambda{game.back_to_play_menu}, 
             on_hover: lambda{game.clear_inspecting}
         ))
-
-        self.hover_current_element
     end
 end

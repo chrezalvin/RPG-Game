@@ -58,8 +58,8 @@ class UserInterface
 
         print_fill("=")
 
-        if @game.current_menu != nil
-            for menu in @game.current_menu.menu_list
+        if @game.menu_manager.current_menu != nil
+            for menu in @game.menu_manager.menu_list
                 puts_bordered_line(menu, "left")
             end
         end
@@ -94,8 +94,8 @@ class UserInterface
         end
 
         print_fill("=")
-        if @game.current_menu.current_selected != nil && @game.current_menu.current_selected.tooltip != nil
-            puts_bordered_line(@game.current_menu.current_selected.tooltip)
+        if @game.menu_manager.current_selected != nil && @game.menu_manager.current_selected.tooltip != nil
+            puts_bordered_line(@game.menu_manager.current_selected.tooltip)
         else
             puts_bordered_line("press up and down arrow key to select and Enter to confirm", "left")
         end

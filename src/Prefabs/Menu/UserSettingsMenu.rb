@@ -4,6 +4,8 @@ require "Parents/Menu"
 require "Parents/MenuElement"
 
 class UserSettingsMenu < Menu
+    # Initialize the user settings menu with the current game settings
+    # @param game [Game] The game object containing the current settings
     def initialize(game)
         if game.is_a? Game
             super()
@@ -11,6 +13,8 @@ class UserSettingsMenu < Menu
         end
     end
 
+    # Reload the menu list based on the current game settings
+    # @param game [Game] The game object containing the current settings
     def reload_menu(game)
         @menu_list = []
         @menu_list.push(MenuElement.new(
