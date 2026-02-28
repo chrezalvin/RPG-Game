@@ -19,7 +19,7 @@ class GameSettings
         @game_data.set_game_data("use_audio", is_use_audio)
     end
 
-    def use_audio?
+    def is_use_audio
         return @game_data.game_data["use_audio"]
     end
 

@@ -8,8 +8,6 @@ require "colorize"
 require_relative "src/Game"
 require_relative "src/UserInterface"
 require_relative "src/UserInput"
-require_relative "src/Prefabs/Menu/MainMenu"
-require_relative "src/Prefabs/Creatures/Enemies/Minotaur"
 
 if __FILE__ == $0
     config = JSON.parse(File.read("config.json"))
@@ -29,11 +27,11 @@ if __FILE__ == $0
     user_input = UserInput.new()
     flag_exit = false
 
-    user_input.on_up{game.current_menu.focus_prev_element}
-    user_input.on_down{game.current_menu.focus_next_element}
-    user_input.on_enter{game.current_menu.select_current_element}
-    user_input.on_right{game.current_menu.select_right_current_element}
-    user_input.on_left{game.current_menu.select_left_current_element}
+    user_input.on_up{game.menu_manager.focus_prev_element}
+    user_input.on_down{game.menu_manager.focus_next_element}
+    user_input.on_enter{game.menu_manager.select_current_element}
+    user_input.on_right{game.menu_manager.select_right_current_element}
+    user_input.on_left{game.menu_manager.select_left_current_element}
 
     game.on_quit_game{flag_exit = true}
 
