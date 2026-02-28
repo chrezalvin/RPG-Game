@@ -12,6 +12,7 @@ require "Parents/Damage"
 require "Parents/Heal"
 require "Parents/Effect"
 require "Parents/Skill"
+require "Parents/Sound"
 
 # Creature class
 class Creature
@@ -22,7 +23,7 @@ class Creature
       attr_reader :description, :name
   end
 
-    attr_reader :name, :usable_skills, :basic_attack, :effects, :on_use_skill, :on_effect_applied, :on_effect_expired,
+    attr_reader :name, :usable_skills, :basic_attack, :effects, :on_use_skill, :on_effect_applied, :on_effect_expired, :on_creature_make_sound,
       :current_hp, :max_hp, :on_heal, :on_get_hit, :on_dead, :on_hp_changed,
       :current_mp, :max_mp, :on_mp_used, :on_mp_added, :on_mp_changed,
       :atk_amount, :atk_colorized, 
@@ -55,6 +56,7 @@ class Creature
     def_delegator :@use_skill_listeners, :subscribe, :on_use_skill
     def_delegator :@on_effect_applied_listeners, :subscribe, :on_effect_applied
     def_delegator :@on_effect_expired_listeners, :subscribe, :on_effect_expired
+    def_delegator :@on_creature_make_sound_listeners, :subscribe, :on_creature_make_sound
 
     def name
       self.class.name
@@ -92,6 +94,7 @@ class Creature
       @use_skill_listeners = Event.new()
       @on_effect_applied_listeners = Event.new()
       @on_effect_expired_listeners = Event.new()
+      @on_creature_make_sound_listeners = Event.new()
     end
 
     def take_damage(damage)
@@ -131,17 +134,14 @@ class Creature
     end
 
     def use_basic_attack(target)
-        if (target.is_a? Creature) && (@basic_attack != nil)
-          
-          @effects.each{|effect| effect.on_before_use_skill(@basic_attack, target)}
-          @use_skill_listeners.emit(@basic_attack, target)
-          
-          @basic_attack.use_skill(target)
+      throw "Error: Cannot use basic attack because the target is not Creature" if (target.is_a? Creature) && (@basic_attack != nil)
 
-          @effects.each{|effect| effect.on_after_use_skill(@basic_attack, target)}
-        else
-          throw "Error: Cannot use basic attack because the target is not Creature"
-        end
+      @effects.each{|effect| effect.on_before_use_skill(@basic_attack, target)}
+      @use_skill_listeners.emit(@basic_attack, target)
+      
+      @basic_attack.use_skill(target)
+
+      @effects.each{|effect| effect.on_after_use_skill(@basic_attack, target)}
     end
 
     def use_skill(idx, target)
@@ -160,6 +160,13 @@ class Creature
 
         @effects.each{|effect| effect.on_after_use_skill(skill, target)}
       end
+    end
+
+    # @param sound [Sound] the sound to be made by the creature
+    def make_sound(sound)
+      throw "Error: sound must be an instance of Sound, got #{sound.class}" unless sound.is_a? Sound
+
+      @on_creature_make_sound_listeners.emit(sound)
     end
 
     def use_skill_by_instance(skill, target)

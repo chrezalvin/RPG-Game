@@ -95,7 +95,21 @@ class UserInterface
 
         print_fill("=")
         if @game.menu_manager.current_selected != nil && @game.menu_manager.current_selected.tooltip != nil
-            puts_bordered_line(@game.menu_manager.current_selected.tooltip)
+            # check if tooltip is too long to fit in one line, if so, split it into multiple lines
+            tooltip = @game.menu_manager.current_selected.tooltip
+            if tooltip.length > @box_width - 4
+                tooltip_lines = []
+                while tooltip.length > @box_width - 4
+                    tooltip_lines.push(tooltip[0...(@box_width - 4)])
+                    tooltip = tooltip[(@box_width - 4)..-1]
+                end
+                tooltip_lines.push(tooltip)
+                for line in tooltip_lines
+                    puts_bordered_line(line, "left")
+                end
+            else
+                puts_bordered_line(@game.menu_manager.current_selected.tooltip)
+            end
         else
             puts_bordered_line("press up and down arrow key to select and Enter to confirm", "left")
         end

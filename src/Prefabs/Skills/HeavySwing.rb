@@ -7,7 +7,6 @@ class HeavySwing < Skill
     @damage_multiplier = 2
     @description = "A classic heavy swing commonly used by warrior, uses #{@skill_mp_usage} mana, dealing #{@damage_multiplier}x of caster's Atk"
     @name = "Heavy Swing"
-    @sound = SwordSliceSound.new()
     def initialize(skill_owner)
         super(skill_owner)
     end
@@ -31,6 +30,7 @@ class HeavySwing < Skill
             damage_amount = (self.class.damage_multiplier * @skill_owner.atk_amount).to_i
             skillDamage = SkillDamage.new(damage_amount, @skill_owner)
 
+            @skill_owner.make_sound(SwordSliceSound.new())
             skillDamage.apply_to(creature)
         end
     end

@@ -9,20 +9,12 @@ require_relative "src/Game"
 require_relative "src/UserInterface"
 require_relative "src/UserInput"
 
+require_relative "src/Data/ConfigData"
+
 if __FILE__ == $0
-    config = JSON.parse(File.read("config.json"))
+    configData = ConfigData.new("config.json")
 
-    if config["user_data_folder"] == nil || config["audio_folder"] == nil
-        puts "Error: Invalid config file. Please make sure the config file contains 'user_data_folder' and 'audio_folder' keys.".red
-        exit(1)
-    end
-
-    user_data_file = config["user_data_folder"]
-    audio_folder = config["audio_folder"]
-
-    select_sound_file = "select.mp3"
-
-    game = Game.new()
+    game = Game.new(configData)
     user_interface = UserInterface.new(game)
     user_input = UserInput.new()
     flag_exit = false

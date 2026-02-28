@@ -29,20 +29,21 @@ class Game
 
     def_delegator :@on_quit_game_listeners, :subscribe, :on_quit_game
 
-    def initialize(user_data_folder = "data/", audio_folder = "assets/sounds/")
-        @game_state = GameState.new(user_data_folder)
+    # @param config_data [ConfigData] The configuration data for the game
+    def initialize(config_data)
+        @game_state = GameState.new(config_data.user_data_base_folder)
         @menu_manager = MenuManager.new(MainMenu.new(self))
-        @player_list = PlayersList.get_player_list
+        @player_list = config_data.is_developer_mode ? PlayersList.get_test_player_list : PlayersList.get_player_list
         @enemies_list = EnemiesList.get_enemies_list
-        @sound = SoundPlayer.new(audio_folder, @game_state)
+        @sound = SoundPlayer.new(config_data.audio_base_folder, @game_state)
         @enemy_about_to_use = nil
 
+        @on_quit_game_listeners = Event.new()
+        
         @menu_manager.on_focus_next_element{@sound.play_sound(SelectSound.new())}
         @menu_manager.on_focus_prev_element{@sound.play_sound(SelectSound.new())}
         @menu_manager.on_select_left_current_element{@sound.play_sound(SelectSound.new())}
         @menu_manager.on_select_right_current_element{@sound.play_sound(SelectSound.new())}
-
-        @on_quit_game_listeners = Event.new()
     end
 
     def initiate_skill(skill_idx)
@@ -87,12 +88,11 @@ class Game
         @game_state.player.on_effect_applied{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")}
         @game_state.player.on_effect_expired{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")}
         @game_state.player.on_heal(lambda{|heal_instance| @game_state.logs.add_log("You healed #{heal_instance.amount_colorized} HP")})
-        @game_state.player.on_dead(lambda do 
+        @game_state.player.on_creature_make_sound{|sound| @sound.play_sound(sound)}
+        @game_state.player.on_dead do 
             @game_state.logs.add_log("You have been slain!")
             @menu_manager.change_menu(YouDeadMenu.new(self))
-        end)
-
-        @game_state.player.on_use_skill{|skill, _| skill.sound != nil ? @sound.play_sound(skill.sound) : nil}
+        end
         
         self.register_new_enemy
 
@@ -117,7 +117,7 @@ class Game
         @game_state.enemy.on_heal{|heal_instance| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} healed #{heal_instance.amount_colorized} HP")}
         @game_state.enemy.on_dead{ @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")}
 
-        @game_state.enemy.on_use_skill{|skill, _| skill.sound != nil ? @sound.play_sound(skill.sound) : nil}
+        @game_state.enemy.on_creature_make_sound{|sound| @sound.play_sound(sound)}
 
         self.decide_next_enemy_action
     end
