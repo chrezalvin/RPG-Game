@@ -1,12 +1,12 @@
 require "Parents/Skill"
 require "Damages/SkillDamage"
+require "Sounds/SwordSliceSound"
 
 class HeavySwing < Skill
     @skill_mp_usage = 10
     @damage_multiplier = 2
-    @description = "A classic heavy swing commonly used by warrior, uses #{@skill_mp_usage} mana, dealing #{@damage_multiplier}x of caster's Atk"
+    @description = "A classic heavy swing commonly used by warrior, dealing #{@damage_multiplier}x of caster's Atk"
     @name = "Heavy Swing"
-    @sound_file = "sword_slice.mp3"
     def initialize(skill_owner)
         super(skill_owner)
     end
@@ -27,9 +27,10 @@ class HeavySwing < Skill
         if super(creature)
             @skill_owner.use_mp(self.class.skill_mp_usage)
 
-            damage_amount = (self.class.damage_multiplier * @skill_owner.atk_amount).to_i
+            damage_amount = (self.class.damage_multiplier * @skill_owner.atk.atk_amount).to_i
             skillDamage = SkillDamage.new(damage_amount, @skill_owner)
 
+            # @skill_owner.make_sound(SwordSliceSound.new())
             skillDamage.apply_to(creature)
         end
     end

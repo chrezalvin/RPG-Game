@@ -12,9 +12,20 @@ class Mage < Creature
     @name = "Mage"
     @chance_to_use_skill = 0.5
     def initialize()
-        super(atk: 5, matk: 30, hp: 80, mp: 200, nmpr: 20, nhpr: 10)
-        @basic_attack = BasicAttack.new(self)
+        super(
+            atk: 5, 
+            matk: 30, 
+            hp: 80, 
+            mp: 200, 
+            defense: 3,
+            nmpr: 20, 
+            nhpr: 10, 
+            acc: 10,
+            speed: 5,
+            dodge: 5
+        )
         @usable_skills = [
+            BasicAttack.new(self),
             HighHeal.new(self), 
             BasicHealing.new(self), 
             MagicMissle.new(self), 
@@ -27,17 +38,16 @@ class Mage < Creature
     end
 
     def decide_next_action(creature)
-        unless creature.is_a? Creature
-            throw "Error: creature must be an instance of Creature, got #{creature.class}"
-        end
+        super(creature)
 
         if rand < self.class.chance_to_use_skill
-            skill = @usable_skills.sample
+            random_idx = rand(@usable_skills.length)
+            skill = self.skill(random_idx)
             if skill.can_use_skill?(creature)
-                return skill
+                return random_idx
             end
         end
 
-        return @basic_attack
+        return 0
     end
 end

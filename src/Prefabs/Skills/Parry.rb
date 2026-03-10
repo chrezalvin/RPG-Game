@@ -1,0 +1,26 @@
+require "Parents/Skill"
+require "Effects/Parrying"
+
+class Parry < Skill
+
+  @skill_mp_usage = 15
+  @description = "Shield yourself against incoming damage, apply Parrying effect until you take damage"
+  @name = "Parry"
+  def initialize(skill_owner)
+    super(skill_owner)
+  end
+
+  def can_use_skill?(creature)
+    @skill_owner.current_mp >= self.class.skill_mp_usage
+  end
+
+  def use_skill(_)
+    if super(_)
+      @skill_owner.use_mp(self.class.skill_mp_usage)
+
+      effect = Parrying.new()
+      
+      effect.apply_effect(@skill_owner)
+    end
+  end
+end

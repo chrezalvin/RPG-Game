@@ -1,4 +1,4 @@
 {
-  "use_audio": true,
-  "preferred_volume": 1.0
+  "use_audio": false,
+  "preferred_volume_percentage": 50
 }

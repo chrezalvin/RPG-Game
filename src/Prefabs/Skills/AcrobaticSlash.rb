@@ -5,13 +5,9 @@ class AcrobaticSlash < Skill
     @damage_multiplier = 1.5
     @skill_mp_usage = 10
     @name = "Acrobatic Slash"
-    @description = "A series of slash midair, dealing #{@damage_multiplier}x of caster's Atk, uses #{@skill_mp_usage} MP"
+    @description = "A series of slash midair, dealing #{@damage_multiplier}x of caster's Atk"
     def initialize(skill_owner)
       super(skill_owner)
-    end
-
-    def self.skill_mp_usage
-      @skill_mp_usage
     end
 
     def self.damage_multiplier
@@ -26,7 +22,7 @@ class AcrobaticSlash < Skill
       if super(creature)
         @skill_owner.use_mp(self.class.skill_mp_usage)
 
-        damage_amount = (self.class.damage_multiplier * @skill_owner.atk_amount).to_i
+        damage_amount = (self.class.damage_multiplier * @skill_owner.atk.atk_amount).to_i
         skillDamage = SkillDamage.new(damage_amount, @skill_owner)
 
         skillDamage.apply_to(creature)

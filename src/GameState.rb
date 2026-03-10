@@ -1,6 +1,7 @@
 require "Logs"
-require "GameSettings"
-require "UserData"
+require "forwardable"
+require "Data/GameSettings"
+require "Data/UserData"
 
 require "Parents/Creature"
 require "Parents/Menu"
@@ -8,18 +9,26 @@ require "Parents/Menu"
 require "Creatures/Enemies/Minotaur"
 require "Menu/MainMenu"
 
-class GameState
-    attr_reader :player, :enemy, :current_menu, :logs, :volume, :is_use_audio
+class GameState extend Forwardable
+    attr_reader :player, :enemy, :current_menu, :logs, :inspecting,
+        :volume, :is_use_audio
+
+    def_delegator :@game_settings, :preferred_volume, :volume
+    def_delegator :@game_settings, :is_use_audio, :is_use_audio
+
     def initialize(user_data_folder)
         @game_settings = GameSettings.new(user_data_folder + "settings.json")
         @user_data = UserData.new(user_data_folder + "user_data.json")
         
+        # @type [Creature]
         @player = nil
+        
+        # @type [Creature]
         @enemy = nil
-        @logs = Logs.new()
 
-        @volume = @game_settings.preferred_volume
-        @is_use_audio = @game_settings.use_audio?
+        # @type [Creature]
+        @inspecting = nil
+        @logs = Logs.new()
     end
 
     def set_logs(logs)
@@ -46,6 +55,18 @@ class GameState
 
             @logs.add_log("You choose #{player.name_colorized}")
         end
+    end
+
+    def inspect_player
+        @inspecting = @player
+    end
+
+    def inspect_enemy
+        @inspecting = @enemy
+    end
+
+    def clear_inspecting
+        @inspecting = nil
     end
 
     def set_audio(volume)

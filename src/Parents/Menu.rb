@@ -1,59 +1,22 @@
+require "forwardable"
+
 require "Parents/MenuElement"
 require "utils/Event"
 
 class Menu
-    attr_reader :selected_idx
+    attr_reader :menu_title, :menu_banner
 
-    @@default_selected_idx = 0
+    # Initialize a menu with the given menu list
+    # @param menu_list [Array<MenuElement>] The list of menu elements to be displayed in the menu
     def initialize(menu_list = [])
-        @selected_idx = @@default_selected_idx
+        @menu_title = "Unknown Menu"
         @menu_list = menu_list
+        @menu_banner = nil
     end
 
-    def menu_list
-        @menu_list.each_with_index.map{|menu, idx| idx == @selected_idx ? "> #{menu.menu_name}" : "  #{menu.menu_name}"}
-    end
-
-    def focus_next_element
-        @selected_idx = (@selected_idx + 1) % (@menu_list.length)
-
-        self.hover_current_element
-    end
-
-    def focus_prev_element
-        @selected_idx = (@selected_idx - 1) % (@menu_list.length)
-
-        self.hover_current_element
-    end
-
-    def select_current_element
-        if @menu_list[@selected_idx].is_a? MenuElement
-            @menu_list[@selected_idx].select_menu_element()
-        end
-    end
-
-    def hover_current_element
-        if @menu_list[@selected_idx].is_a? MenuElement
-            @menu_list[@selected_idx].hover_menu_element()
-        end
-    end
-
-    def select_right_current_element
-        if @menu_list[@selected_idx].is_a? MenuElement
-            @menu_list[@selected_idx].select_right_menu_element()
-        end
-    end
-
-    def select_left_current_element
-        if @menu_list[@selected_idx].is_a? MenuElement
-            @menu_list[@selected_idx].select_left_menu_element()
-        end
-    end
-
-    def current_selected
-        if @menu_list[@selected_idx].is_a? MenuElement
-            @menu_list[@selected_idx]
-        else nil
-        end
+    # @param selected_idx [Integer] the index of the currently selected menu element
+    # @return [Array<MenuElement>] the list of menu elements to be displayed in the menu
+    def menu_list(selected_idx = 0)
+        []
     end
 end
