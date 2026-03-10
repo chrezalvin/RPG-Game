@@ -28,7 +28,7 @@ class Vampirism < Skill
         if super(creature)            
             @skill_owner.use_mp(self.class.skill_mp_usage)
 
-            damage_amount = @skill_owner.atk_amount.to_i
+            damage_amount = @skill_owner.atk.atk_amount
             skillDamage = SkillDamage.new(damage_amount, @skill_owner)
 
             skillDamage.apply_to(creature)

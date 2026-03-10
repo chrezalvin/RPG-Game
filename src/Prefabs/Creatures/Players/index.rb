@@ -1,15 +1,19 @@
+require "Creatures/Enemies/Vampire"
+
 require_relative "./Viking"
 require_relative "./Mage"
 require_relative "./Joe"
 
+
 class PlayersList
     @@players_list = [
         Viking,
-        Mage
+        Mage,
     ]
-
+    
     @@players_list_test = [
-        Joe
+        Joe,
+        Vampire,
     ]
 
     def self.get_player_list

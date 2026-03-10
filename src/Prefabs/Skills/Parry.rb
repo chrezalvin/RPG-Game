@@ -1,11 +1,11 @@
 require "Parents/Skill"
-require "Effects/Shielded"
+require "Effects/Parrying"
 
-class Guard < Skill
+class Parry < Skill
 
-  @skill_mp_usage = 5
-  @description = "Shield yourself against incoming damage, apply Shielded effect until you take damage, uses #{@skill_mp_usage} mana"
-  @name = "Guard"
+  @skill_mp_usage = 15
+  @description = "Shield yourself against incoming damage, apply Parrying effect until you take damage, uses #{@skill_mp_usage} mana"
+  @name = "Parry"
   def initialize(skill_owner)
     super(skill_owner)
   end
@@ -22,7 +22,7 @@ class Guard < Skill
     if super(creature)
       @skill_owner.use_mp(self.class.skill_mp_usage)
 
-      effect = Shielded.new()
+      effect = Parrying.new()
       
       effect.apply_effect(@skill_owner)
     end

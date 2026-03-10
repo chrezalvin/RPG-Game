@@ -8,9 +8,22 @@ class Minotaur < Creature
     @description = nil
     @chance_to_use_skill = 0.3
     def initialize
-        super(hp: 100, mp: 20, atk: 10, matk: 10, nmpr: 5, nhpr: 5)
-        @basic_attack = BasicAttack.new(self)
-        @usable_skills = [HeavySwing.new(self)]
+        super(
+            hp: 100, 
+            mp: 20, 
+            atk: 10, 
+            matk: 10, 
+            nmpr: 5, 
+            nhpr: 5, 
+            acc: 10,
+            defense: 7, 
+            speed: 5
+        )
+
+        @usable_skills = [
+            BasicAttack.new(self), 
+            HeavySwing.new(self)
+        ]
     end
 
     def self.chance_to_use_skill
@@ -21,12 +34,13 @@ class Minotaur < Creature
         super(creature)
 
         if rand < self.class.chance_to_use_skill
-            skill = @usable_skills.sample
+            random_idx = rand(@usable_skills.length)
+            skill = self.skill(random_idx)
             if skill.can_use_skill?(creature)
-                return skill
+                return random_idx
             end
         end
 
-        return @basic_attack
+        return 0
     end
 end

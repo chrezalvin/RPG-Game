@@ -20,8 +20,13 @@ class GameState extend Forwardable
         @game_settings = GameSettings.new(user_data_folder + "settings.json")
         @user_data = UserData.new(user_data_folder + "user_data.json")
         
+        # @type [Creature]
         @player = nil
+        
+        # @type [Creature]
         @enemy = nil
+
+        # @type [Creature]
         @inspecting = nil
         @logs = Logs.new()
     end

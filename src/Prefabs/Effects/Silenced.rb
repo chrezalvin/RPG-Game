@@ -1,28 +1,29 @@
 require "Parents/Effect"
 
-class Cursed < Effect
-    @heal_reduction_multiplier_percentage = 50
-    @name = "Cursed"
-    @description = "Reduce the next heal received by #{@heal_reduction_multiplier_percentage}%"
+class Silenced < Effect
+    @matk_reduction_multiplier_percentage = 50
+    @name = "Silenced"
+    @description = "Reduce the next heal received by #{@matk_reduction_multiplier_percentage}%"
     def initialize(stack = 1)
         super()
         @stack = stack
     end
 
-    def self.heal_reduction_multiplier_percentage
-        @heal_reduction_multiplier_percentage
+    def self.matk_reduction_multiplier_percentage
+        @matk_reduction_multiplier_percentage
     end
 
-    def on_before_heal(heal_instance)
-        super(heal_instance)
+    def modify_matk(matk)
+        super(matk)
 
-        heal_instance.heal = (heal_instance.heal * (100 - self.class.heal_reduction_multiplier_percentage) / 100).to_i
+        matk.matk_amount = (matk.matk_amount * (100 - self.class.matk_reduction_multiplier_percentage) / 100).to_i
+    end
+  
+    def on_before_use_skill(skill, target)
+        super(skill, target)
 
         @stack -= 1
-
-        if self.is_expired?
-            @effect_owner.cleanup_expired_effects
-        end
+        @effect_owner.cleanup_expired_effects if self.is_expired?
     end
 
     def apply_effect(creature)
