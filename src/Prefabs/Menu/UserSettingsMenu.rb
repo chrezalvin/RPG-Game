@@ -31,4 +31,8 @@ class UserSettingsMenu < Menu
         ))
         @menu_list.push(MenuElement.new(menu_name: "Back", on_selected: lambda {game.back_to_main_menu}))
     end
+
+    def menu_list(selected_idx = 0)
+        @menu_list
+    end
 end

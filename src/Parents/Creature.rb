@@ -157,6 +157,7 @@ class Creature
       self.defense.apply_defense(damage)
 
       @hp.take_damage(damage)
+      damage.has_effects.each{|effect| effect.apply_effect(self)}
 
       unless damage.is_effect
         @effects.each{|effect| effect.on_after_take_damage(damage)}
@@ -322,15 +323,6 @@ class Creature
     def skill(idx)
       return @usable_skills[idx]
     end
-
-    # @return [Skill, nil] the basic attack skill of the creature if it exists, nil otherwise
-    # def basic_attack
-    #   if @usable_skills.length > 0
-    #     return @usable_skills[0]
-    #   end
-
-    #   return nil
-    # end
 
     # @return [Boolean] true if the creature is dead, false otherwise
     def is_dead?

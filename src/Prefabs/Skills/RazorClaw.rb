@@ -11,10 +11,6 @@ class RazorClaw < Skill
         super(skill_owner)
     end
 
-    def self.skill_mp_usage
-        @skill_mp_usage
-    end
-
     def self.damage_multiplier
         @damage_multiplier
     end

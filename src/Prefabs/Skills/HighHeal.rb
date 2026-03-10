@@ -5,14 +5,10 @@ class HighHeal < Skill
 
   @skill_mp_usage = 15
   @skill_hp_heal_percentage = 30
-  @description = "Great Heal! heal #{@skill_hp_heal_percentage}% of your hp, uses #{@skill_mp_usage} mana"
+  @description = "Great Heal! heal #{@skill_hp_heal_percentage}% of your hp"
   @name = "Great Heal"
   def initialize(skill_owner)
     super(skill_owner)
-  end
-
-  def self.skill_mp_usage
-    @skill_mp_usage
   end
 
   def self.skill_hp_heal_percentage

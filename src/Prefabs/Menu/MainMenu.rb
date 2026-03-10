@@ -23,4 +23,8 @@ class MainMenu < Menu
             ))
         end
     end
+
+    def menu_list(selected_idx = 0)
+        @menu_list
+    end
 end

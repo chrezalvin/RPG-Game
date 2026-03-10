@@ -2,7 +2,7 @@ require "colorize"
 require "Parents/Creature"
 
 class Damage
-    attr_accessor :damage, :damage_type, :is_effect, :damage_dealer
+    attr_accessor :damage, :damage_type, :is_effect, :damage_dealer, :has_effects
 
     # @param damage_amount [Integer] the amount of damage
     # @param damage_dealer [Creature, nil] the creature that deals the damage
@@ -15,6 +15,9 @@ class Damage
         @damage_dealer = damage_dealer
         @damage_type = "unknown"
         @is_effect = is_effect
+
+        # @type [Array<Effect>] the effects that cause this damage, if applicable
+        @has_effects = []
     end
 
     # @param creature [Creature] the creature to apply the damage to

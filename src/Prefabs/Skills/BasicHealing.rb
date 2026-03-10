@@ -4,14 +4,10 @@ require "Heal/BasicHeal"
 class BasicHealing < Skill
   @skill_mp_usage = 10
   @skill_hp_heal_percentage = 15
-  @description = "Heals #{@skill_hp_heal_percentage}% of your hp, uses #{@skill_mp_usage} mana"
+  @description = "Heals #{@skill_hp_heal_percentage}% of your hp"
   @name = "Basic Healing"
   def initialize(skill_owner)
     super(skill_owner)
-  end
-
-  def self.skill_mp_usage
-    @skill_mp_usage
   end
 
   def self.skill_hp_heal_percentage

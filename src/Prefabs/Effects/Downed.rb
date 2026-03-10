@@ -25,6 +25,17 @@ class Shielded < Effect
         @effect_owner.cleanup_expired_effects
     end
 
+    def apply_effect(creature)
+        found = creature.find_effect(self.class)
+
+        if found.nil?
+            creature.apply_effect(self)
+            @effect_owner = creature
+        else
+            found.add_stack(@stack)
+        end
+    end
+
     def is_expired?
         @is_used
     end

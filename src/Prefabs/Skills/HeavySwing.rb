@@ -5,7 +5,7 @@ require "Sounds/SwordSliceSound"
 class HeavySwing < Skill
     @skill_mp_usage = 10
     @damage_multiplier = 2
-    @description = "A classic heavy swing commonly used by warrior, uses #{@skill_mp_usage} mana, dealing #{@damage_multiplier}x of caster's Atk"
+    @description = "A classic heavy swing commonly used by warrior, dealing #{@damage_multiplier}x of caster's Atk"
     @name = "Heavy Swing"
     def initialize(skill_owner)
         super(skill_owner)

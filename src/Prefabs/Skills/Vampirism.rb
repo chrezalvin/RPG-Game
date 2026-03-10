@@ -1,5 +1,6 @@
 require "Parents/Skill"
 require "Damages/SkillDamage"
+require "Damages/LifeStealDamage"
 require "Heal/BasicHeal"
 
 class Vampirism < Skill
@@ -7,17 +8,13 @@ class Vampirism < Skill
     @skill_heal_multiplier_percentage = 50
     @skill_mp_usage = 30
     @name = "Vampirism"
-    @description = "Deals damage to the enemy proportional to your ATK and heal yourself for #{@skill_heal_multiplier_percentage}% of the damage dealt, uses #{@skill_mp_usage} mana"
+    @description = "Deals damage to the enemy proportional to your ATK and heal yourself for #{@skill_heal_multiplier_percentage}% of the damage dealt"
     def initialize(skill_owner)
         super(skill_owner)
     end
 
     def self.skill_heal_multiplier_percentage
         @skill_heal_multiplier_percentage
-    end
-
-    def self.skill_mp_usage
-        @skill_mp_usage
     end
 
     def can_use_skill?(creature)
@@ -29,14 +26,14 @@ class Vampirism < Skill
             @skill_owner.use_mp(self.class.skill_mp_usage)
 
             damage_amount = @skill_owner.atk.atk_amount
-            skillDamage = SkillDamage.new(damage_amount, @skill_owner)
+            lifestealDamage = LifeStealDamage.new(
+                amount: damage_amount,
+                damage_dealer: @skill_owner,
+                damage_type: "skill",
+                lifesteal_percentage: self.class.skill_heal_multiplier_percentage
+            )
 
-            skillDamage.apply_to(creature)
-
-            heal_amount = (damage_amount * self.class.skill_heal_multiplier_percentage / 100).to_i
-            healInstance = BasicHeal.new(heal_amount, @skill_owner)
-
-            healInstance.apply_to(@skill_owner)
+            lifestealDamage.apply_to(creature)
         end
     end
 end

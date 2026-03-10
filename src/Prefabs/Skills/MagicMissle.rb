@@ -5,14 +5,10 @@ class MagicMissle < Skill
 
   @skill_mp_usage = 15
   @skill_damage_multiplier = 2
-  @description = "Cast a missle made out of magic, deals #{@skill_damage_multiplier}x of caster's Matk, uses #{@skill_mp_usage} mana"
+  @description = "Cast a missle made out of magic, deals #{@skill_damage_multiplier}x of caster's Matk"
   @name = "Magic Missle"
   def initialize(skill_owner)
     super(skill_owner)
-  end
-
-  def self.skill_mp_usage
-    @skill_mp_usage
   end
 
   def self.skill_damage_multiplier
