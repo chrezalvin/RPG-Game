@@ -5,14 +5,10 @@ class MagicArrows < Skill
 
   @skill_mp_usage = 40
   @skill_damage_multiplier = 0.5
-  @description = "Cast three arrows made out of magic, each arrow deals #{@skill_damage_multiplier}x of caster's Matk, uses #{@skill_mp_usage} mana"
+  @description = "Cast three arrows made out of magic, each arrow deals #{@skill_damage_multiplier}x of caster's Matk"
   @name = "Magic Arrows"
   def initialize(skill_owner)
     super(skill_owner)
-  end
-
-  def self.skill_mp_usage
-    @skill_mp_usage
   end
 
   def self.skill_damage_multiplier

@@ -6,7 +6,7 @@ class TransformBat < Skill
     @transform_skill_mp_usage = 30
     @transform_back_mp_usage = 0
     @name = "Transform (Bat)"
-    @description = "Transforms into a Bat, increases Dodge and MATK by 100% in exchange of reduced ATK and DEF by 50%, Damage taken will be doubled in bat form, uses #{@transform_skill_mp_usage} mana, use skill back to transform back for free"
+    @description = "Transforms into a Bat, increases Dodge and MATK by 100% in exchange of reduced ATK and DEF by 50%, Damage taken will be doubled in bat form, use skill back to transform back for free"
     def initialize(skill_owner)
         super(skill_owner)
     end

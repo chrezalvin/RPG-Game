@@ -5,7 +5,7 @@ require "Damages/EffectDamage"
 class Parrying < Effect
     @damage_reduction_multiplier_percentage = 50
     @name = "Parrying"
-    @description = "Reduces the next damage taken by #{@damage_reduction_multiplier}% then attacks back using basic attack"
+    @description = "Reduces the next damage taken by #{@damage_reduction_multiplier_percentage}% then attacks back using basic attack"
     def initialize(stack = 1)
         super()
         @stack = stack
@@ -28,6 +28,17 @@ class Parrying < Effect
         end
 
         @effect_owner.use_skill(0, damage.damage_dealer)
+    end
+
+    def apply_effect(creature)
+        found = creature.find_effect(self.class)
+
+        if found.nil?
+            creature.apply_effect(self)
+            @effect_owner = creature
+        else
+            found.add_stack(@stack)
+        end
     end
 
     def is_expired?

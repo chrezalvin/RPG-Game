@@ -16,6 +16,8 @@ require "Menu/YouDeadMenu"
 require "Menu/ChooseSkillMenu"
 require "Menu/InspectingMenu"
 require "Menu/UserSettingsMenu"
+require "Menu/InspectSkillMenu"
+require "Menu/InspectEffectMenu"
 
 require "Sounds/SelectSound"
 
@@ -65,7 +67,7 @@ class Game
             end
 
             if @player_turns == 0
-                while @enemy_turns > 0 && !@game_state.enemy.is_dead?
+                while @enemy_turns > 0 && !@game_state.player.is_dead?
                     self.trigger_enemy_attack
                     self.decide_next_enemy_action
                     @enemy_turns -= 1
@@ -174,6 +176,18 @@ class Game
 
     def go_to_inspecting_menu
         @menu_manager.change_menu(InspectingMenu.new(self))
+
+        self
+    end
+
+    def go_to_skill_inspecting_menu
+        @menu_manager.change_menu(InspectSkillMenu.new(self))
+
+        self
+    end
+
+    def go_to_effect_inspecting_menu
+        @menu_manager.change_menu(InspectEffectMenu.new(self))
 
         self
     end

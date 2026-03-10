@@ -14,7 +14,7 @@ require "Parents/Stats/Speed"
 
 
 class Effect
-    attr_reader :effect_owner
+    attr_reader :effect_owner, :name, :description  
     attr_reader :stack
 
     class << self
@@ -136,12 +136,14 @@ class Effect
         true
     end
 
+    # @param amount [Integer] the amount of stack to add
     def add_stack(amount)
         unless @stack.nil?
             @stack += amount
         end
     end
 
+    # @param creature [Creature] the creature to apply the effect to
     def apply_effect(creature)
         throw "creature must be an instance of Creature, got #{creature.class}" unless creature.is_a? Creature
 

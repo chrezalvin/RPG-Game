@@ -50,7 +50,10 @@ class MenuManager extend Forwardable
 
     # @return [Array<String>]
     def menu_list
-        @current_menu.menu_list.each_with_index.map{|menu, idx| idx == @selected_idx ? "> #{menu.menu_name}" : "  #{menu.menu_name}"}
+        @current_menu
+            .menu_list(@selected_idx)
+            .each_with_index
+            .map{|menu_element, idx| idx == @selected_idx ? "> #{menu_element.menu_name}" : "  #{menu_element.menu_name}"}
     end
 
     # @return [void]

@@ -5,11 +5,12 @@ class Skill
     attr_reader :name, :damage, :description
 
     class << self
-        attr_reader :description, :name, :sound
+        attr_reader :description, :name, :sound, :skill_mp_usage
     end
 
     @name = "unknown skill"
     @description = "unknown description"
+    @skill_mp_usage = nil
     # @param skill_owner [Creature] the creature that owns the skill
     def initialize(skill_owner)
         throw "skill owner must be a Creature, got #{skill_owner.class}" unless skill_owner.is_a? Creature
@@ -27,6 +28,10 @@ class Skill
 
     def name_colorized
         self.class.name.colorize(:light_magenta)  
+    end
+
+    def skill_mp_usage
+        self.class.skill_mp_usage
     end
 
     # check if the skill can be used on the creature

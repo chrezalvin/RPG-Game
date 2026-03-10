@@ -3,7 +3,7 @@ require "Parents/Effect"
 class Silenced < Effect
     @matk_reduction_multiplier_percentage = 50
     @name = "Silenced"
-    @description = "Reduce the next heal received by #{@matk_reduction_multiplier_percentage}%"
+    @description = "Reduces the next MATK by #{@matk_reduction_multiplier_percentage}%"
     def initialize(stack = 1)
         super()
         @stack = stack
@@ -17,10 +17,6 @@ class Silenced < Effect
         super(matk)
 
         matk.matk_amount = (matk.matk_amount * (100 - self.class.matk_reduction_multiplier_percentage) / 100).to_i
-    end
-  
-    def on_before_use_skill(skill, target)
-        super(skill, target)
 
         @stack -= 1
         @effect_owner.cleanup_expired_effects if self.is_expired?
