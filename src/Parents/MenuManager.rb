@@ -36,7 +36,7 @@ class MenuManager extend Forwardable
         @on_hover_current_element = Event.new
     end
 
-    
+    # @param new_menu [Menu] the new menu to be displayed
     def change_menu(new_menu)
         throw "Error: new_menu is not a Menu object" unless new_menu.is_a? Menu
 
@@ -48,17 +48,12 @@ class MenuManager extend Forwardable
         self.hover_current_element
     end
 
+    # @return [Array<String>]
     def menu_list
         @current_menu.menu_list.each_with_index.map{|menu, idx| idx == @selected_idx ? "> #{menu.menu_name}" : "  #{menu.menu_name}"}
     end
 
-    def current_selected
-        if @current_menu.menu_list[@selected_idx].is_a? MenuElement
-            @current_menu.menu_list[@selected_idx]
-        else nil
-        end
-    end
-
+    # @return [void]
     def focus_next_element
         @selected_idx = (@selected_idx + 1) % (@current_menu.menu_list.length)
         @on_focus_next_element.emit
@@ -66,6 +61,7 @@ class MenuManager extend Forwardable
         self.hover_current_element
     end
 
+    # @return [void]
     def focus_prev_element
         @selected_idx = (@selected_idx - 1) % (@current_menu.menu_list.length)
         @on_focus_prev_element.emit
@@ -73,12 +69,14 @@ class MenuManager extend Forwardable
         self.hover_current_element
     end
 
+    # @return [void]
     def select_current_element
         if @current_menu.menu_list[@selected_idx].is_a? MenuElement
             @current_menu.menu_list[@selected_idx].select_menu_element()
         end
     end
 
+    # @return [void]
     def hover_current_element
         if @current_menu.menu_list[@selected_idx].is_a? MenuElement
             if @current_menu.menu_list[@selected_idx].hover_menu_element()
@@ -87,6 +85,7 @@ class MenuManager extend Forwardable
         end
     end
 
+    # @return [void]
     def select_right_current_element
         if @current_menu.menu_list[@selected_idx].is_a? MenuElement
             if @current_menu.menu_list[@selected_idx].select_right_menu_element()
@@ -95,6 +94,7 @@ class MenuManager extend Forwardable
         end
     end
 
+    # @return [void]
     def select_left_current_element
         if @current_menu.menu_list[@selected_idx].is_a? MenuElement
             if @current_menu.menu_list[@selected_idx].select_left_menu_element()
@@ -103,6 +103,7 @@ class MenuManager extend Forwardable
         end
     end
 
+    # @return [MenuElement, nil]
     def current_selected
         if @current_menu.menu_list[@selected_idx].is_a? MenuElement
             @current_menu.menu_list[@selected_idx]

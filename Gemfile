@@ -11,3 +11,5 @@ gem "curses", "~> 1.5"
 gem "gosu", "~> 1.4.6"
 
 gem "solargraph", "~> 0.58.2"
+
+gem "rspec", "~> 3.13"

@@ -5,6 +5,7 @@ require "Parents/Menu"
 require "Parents/MenuElement"
 
 class ChooseSkillMenu < Menu
+  # @param game [Game]
   def initialize(game)
     throw "Error: game is not a Game object" unless game.is_a? Game
     throw "Error: game.player is nil" if game.player == nil
@@ -15,17 +16,12 @@ class ChooseSkillMenu < Menu
       .player
       .usable_skills
       .each_with_index
-      .map{            
+      .map{
         |skill, idx| 
-          MenuElement.new(
-            menu_name: skill.name, 
-            on_selected: lambda{game.initiate_skill(idx); game.back_to_play_menu},
-            tooltip: skill.description
-          )
           if skill.can_use_skill?(game.enemy)
             MenuElement.new(
               menu_name: skill.name, 
-              on_selected: lambda{game.initiate_skill(idx); game.back_to_play_menu},
+              on_selected: lambda{game.initiate_skill(idx)},
               tooltip: skill.description
             )
           else

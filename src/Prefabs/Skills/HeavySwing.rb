@@ -27,10 +27,10 @@ class HeavySwing < Skill
         if super(creature)
             @skill_owner.use_mp(self.class.skill_mp_usage)
 
-            damage_amount = (self.class.damage_multiplier * @skill_owner.atk_amount).to_i
+            damage_amount = (self.class.damage_multiplier * @skill_owner.atk.atk_amount).to_i
             skillDamage = SkillDamage.new(damage_amount, @skill_owner)
 
-            @skill_owner.make_sound(SwordSliceSound.new())
+            # @skill_owner.make_sound(SwordSliceSound.new())
             skillDamage.apply_to(creature)
         end
     end

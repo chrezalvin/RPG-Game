@@ -59,6 +59,9 @@ class UserInterface
         print_fill("=")
 
         if @game.menu_manager.current_menu != nil
+            if @game.menu_manager.current_menu.menu_banner != nil
+                puts_bordered_line(@game.menu_manager.current_menu.menu_banner, "center")
+            end
             for menu in @game.menu_manager.menu_list
                 puts_bordered_line(menu, "left")
             end
@@ -78,8 +81,9 @@ class UserInterface
         end
 
         if @game.inspecting != nil
+            # @type [Creature]
             inspecting = @game.inspecting
-            buffsDebuffs = inspecting.effects.map{|effect| effect.name}.join(", ")
+            buffsDebuffs = inspecting.effects.map{|effect| "#{effect.name} #{effect.stack && effect.stack > 1 ? "(#{effect.stack})" : ""}"}.join(", ")
 
             
 
@@ -87,9 +91,9 @@ class UserInterface
             puts_bordered_line("#{inspecting.name}", "center")
             puts_bordered_line("", "left")
             puts_bordered_line("HP: #{inspecting.current_hp_colorized}/#{inspecting.max_hp_colorized}  MP: #{inspecting.current_mp_colorized}/#{inspecting.max_mp_colorized}", "left")
-            puts_bordered_line("Atk: #{inspecting.atk_colorized}  Matk: #{inspecting.matk_colorized}", "left")
-            puts_bordered_line("Natural HP Regen: #{inspecting.natural_hp_regen}", "left")
-            puts_bordered_line("Natural MP Regen: #{inspecting.natural_mp_regen}", "left")
+            puts_bordered_line("Atk: #{inspecting.atk.atk_colorized}  Matk: #{inspecting.matk.matk_colorized}", "left")
+            puts_bordered_line("Natural HP Regen: #{inspecting.natural_hp_regen.natural_hp_regen}", "left")
+            puts_bordered_line("Natural MP Regen: #{inspecting.natural_mp_regen.natural_mp_regen}", "left")
             puts_bordered_line("Buffs/Debuffs: #{buffsDebuffs}", "left")
         end
 
