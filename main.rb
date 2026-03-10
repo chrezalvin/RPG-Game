@@ -21,7 +21,10 @@ if __FILE__ == $0
 
     user_input.on_up{game.menu_manager.focus_prev_element}
     user_input.on_down{game.menu_manager.focus_next_element}
+
     user_input.on_enter{game.menu_manager.select_current_element}
+    user_input.on_space{game.menu_manager.select_current_element}
+
     user_input.on_right{game.menu_manager.select_right_current_element}
     user_input.on_left{game.menu_manager.select_left_current_element}
 
