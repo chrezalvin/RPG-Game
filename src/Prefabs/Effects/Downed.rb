@@ -1,42 +1,40 @@
-require "Parents/Effect"
+require "Parents/Action/Effect"
 
-require "Damages/EffectDamage"
-
-class Shielded < Effect
-    @damage_increase_multiplier = 0.5
-    @name = "Downed"
-    @description = "Increases the next damage taken by #{@damage_increase_multiplier * 100}%"
+class Downed < Effect
     def initialize()
-        super()
-        @is_used = false
+        super(
+            name: "Downed",
+            description: "Increases damage taken by 50%, removed next turn"
+        )
+
+        @damage_increase_multiplier_percentage = 50 
     end
 
-    def self.damage_increase_multiplier
-        @damage_increase_multiplier
+    def short_display_name
+        "Dn"
+    end
+
+    def on_attach(creature)
+        super(creature)
+
+        creature.damageable.on_before_take_damage.subscribe(method(:on_before_take_damage))
+        creature.turnable.on_before_turn_end.subscribe(method(:on_turn_ends))
+    end
+
+    def on_detach(creature)
+        creature.damageable.on_before_take_damage.unsubscribe(method(:on_before_take_damage))
+        creature.turnable.on_before_turn_end.unsubscribe(method(:on_turn_ends))
     end
 
     def on_before_take_damage(damage)
         super(damage)
 
-        damage.damage = (damage.damage * (100 + self.class.damage_increase_multiplier) / 100).to_i
-        @is_used = true
+        damage.damage = (damage.damage * (100 + @damage_increase_multiplier_percentage) / 100).to_i
 
-
-        @effect_owner.cleanup_expired_effects
+        @effect_owner.effectable.remove_effect(self)
     end
 
-    def apply_effect(creature)
-        found = creature.find_effect(self.class)
-
-        if found.nil?
-            creature.apply_effect(self)
-            @effect_owner = creature
-        else
-            found.add_stack(@stack)
-        end
-    end
-
-    def is_expired?
-        @is_used
+    def on_turn_ends
+        @effect_owner.effectable.remove_effect(self)
     end
 end

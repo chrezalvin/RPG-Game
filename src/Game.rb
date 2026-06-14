@@ -18,16 +18,19 @@ require "Menu/InspectingMenu"
 require "Menu/UserSettingsMenu"
 require "Menu/InspectSkillMenu"
 require "Menu/InspectEffectMenu"
+require "Menu/MapMenu"
+require "Menu/MapPauseMenu"
+require "Menu/DefeatEnemyMenu"
 
 require "Sounds/SelectSound"
 
 class Game
     extend Forwardable
 
-    attr_reader :player_list, :enemies_list, :menu_manager, :inspecting, :enemy_about_to_use, :on_quit_game, :player_turns, :enemy_turns,
-        :player, :enemy, :volume, :is_use_audio, :inspecting, :inspecting_player, :inspecting_enemy, :clear_inspecting
+        attr_reader :player_list, :enemies_list, :menu_manager, :inspecting, :enemy_about_to_use, :on_quit_game, 
+        :player, :enemy, :volume, :is_use_audio, :inspecting, :inspecting_player, :inspecting_enemy, :clear_inspecting, :current_turn, :player_map_instance
 
-    def_delegators :@game_state, :player, :enemy, :volume, :is_use_audio, :inspecting, :inspect_player, :inspect_enemy, :clear_inspecting
+    def_delegators :@game_state, :player, :enemy, :volume, :is_use_audio, :inspecting, :inspect_player, :inspect_enemy, :clear_inspecting, :current_turn, :player_map_instance
 
     def_delegator :@on_quit_game_listeners, :subscribe, :on_quit_game
 
@@ -41,10 +44,6 @@ class Game
 
         # @type [Integer, nil] the index of the skill that the enemy is about to use, nil if the enemy is not about to use any skill
         @enemy_about_to_use_idx = nil
-
-        @player_turns = 0
-        @enemy_turns = 0
-
         @on_quit_game_listeners = Event.new()
         
         @menu_manager.on_focus_next_element{@sound.play_sound(SelectSound.new())}
@@ -53,91 +52,128 @@ class Game
         @menu_manager.on_select_right_current_element{@sound.play_sound(SelectSound.new())}
     end
 
-    def initiate_skill(skill_idx)
-        if @game_state.player == nil || @game_state.enemy == nil
-            return
-        end
-
-        if @player_turns > 0
-            @player_turns -= 1
-            @game_state.player.use_skill(skill_idx, @game_state.enemy)
-
-            if @game_state.enemy.is_dead?
-                self.register_new_enemy
-            end
-
-            if @player_turns == 0
-                while @enemy_turns > 0 && !@game_state.player.is_dead?
-                    self.trigger_enemy_attack
-                    self.decide_next_enemy_action
-                    @enemy_turns -= 1
-                end
-
-                self.get_turns
-            end
-        end
-
-        if @game_state.player.is_dead?
-            @menu_manager.change_menu(YouDeadMenu.new(self))
-        else
-            @menu_manager.change_menu(PlayMenu.new(self))
-        end
-    end
-
-    def trigger_enemy_attack
-        if @game_state.player != nil && @game_state.enemy != nil
-            @game_state.enemy.use_skill(@enemy_about_to_use_idx, @game_state.player)
-        end
-    end
-    
+    # @param player [Creature] the player to be set as the current player
     def play_game(player)
         @game_state.set_player(player.new())
 
-        @game_state.player.on_take_damage{|damage| @game_state.logs.add_log("you received #{damage.amount_colorized} #{damage.damage_type} damage")}
-        @game_state.player.on_use_skill{|skill, target| @game_state.logs.add_log("You used #{skill.name_colorized}")}
-        @game_state.player.on_effect_applied{|effect| @game_state.logs.add_log("You are affected by #{effect.name_colorized}")}
-        @game_state.player.on_effect_expired{|effect| @game_state.logs.add_log("#{effect.name_colorized} on you has expired")}
-        @game_state.player.on_heal(lambda{|heal_instance| @game_state.logs.add_log("You healed #{heal_instance.amount_colorized} HP")})
-        @game_state.player.on_creature_make_sound{|sound| @sound.play_sound(sound)}
-        @game_state.player.on_damage_miss{|damage| @game_state.logs.add_log("You dodged the attack!")}
-        @game_state.player.on_dead{@game_state.logs.add_log("You have been slain!")}
-        
-        self.register_new_enemy
+        @game_state.player.damageable.on_after_take_damage.subscribe{|damage|
+            @game_state.logs.add_log("you received #{damage.amount_colorized} #{damage.damage_type} damage")
+        }
 
-        @menu_manager.change_menu(PlayMenu.new(self))
+        @game_state.player.skill_usable.on_before_use_skill.subscribe{|skill, target| 
+            @game_state.logs.add_log("You use #{skill.name_colorized}")
+        }
+
+        # @param effect [Effect] the effect that was applied
+        @game_state.player.effectable.on_after_effect_applied.subscribe {|effect| 
+            @game_state.logs.add_log("You are affected by #{effect.display_name}")
+        }
+
+        # @param effect [Effect] the effect that was applied
+        @game_state.player.effectable.on_after_remove_effect.subscribe {|effect|
+            @game_state.logs.add_log("#{effect.display_name} on you has expired")
+        }
+
+        @game_state.player.healable.on_after_heal.subscribe {|heal_instance|
+            @game_state.logs.add_log("You healed #{heal_instance.amount_colorized} HP")
+        }
+
+        @game_state.player.damageable.on_damage_miss.subscribe {|damage|
+            @game_state.logs.add_log("You dodged the attack!")
+        }
+
+        @game_state.player.killable.on_death.subscribe {
+            @game_state.logs.add_log("You have been slain!")
+            @menu_manager.change_menu(YouDeadMenu.new(self))
+        }
+
+        # @param fight [Fight] the fight that was started
+        @game_state.player.fightable.on_after_fight_start_listeners.subscribe{|fight|
+            self.register_new_enemy(fight.with)
+        }
+
+        @menu_manager.change_menu(MapMenu.new(self))
     end
 
-    def get_turns
-        @player_turns = @game_state.player.speed.calculate_turns(@game_state.enemy)
-        @enemy_turns = @game_state.enemy.speed.calculate_turns(@game_state.player)
-    end
+    def trigger_enemy_attack
+        if @game_state.player == nil || @game_state.enemy == nil
+            throw "Cannot trigger enemy attack when player or enemy is nil"
+        end
 
-    def decide_next_enemy_action
-        if @game_state.enemy != nil && @game_state.player != nil
-            enemy = @game_state.enemy
-            player = @game_state.player
+        skill = @game_state.enemy.decide_next_action(@game_state.player)
 
-            @enemy_about_to_use_idx = enemy.decide_next_action(player)
-            skill = enemy.skill(@enemy_about_to_use_idx)
-
-            @game_state.logs.add_log("#{enemy.name_colorized} is preparing to use #{skill.name_colorized}!")
+        if skill == nil || skill == -1
+            @game_state.enemy.end_turn
+        else
+            @game_state.enemy.use_skill(skill, @game_state.player)
         end
     end
 
-    def register_new_enemy
-        @game_state.set_enemy(@enemies_list.sample.new())
+    # @param enemy [Creature] the enemy to be registered
+    def register_new_enemy(enemy)
+        @game_state.set_enemy(enemy)
 
-        @game_state.enemy.on_take_damage{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} received #{damage.amount_colorized} #{damage.damage_type} damage")}
-        @game_state.enemy.on_use_skill{|skill, target| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} used #{skill.name_colorized}")}
-        @game_state.enemy.on_effect_applied{|effect| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is affected by #{effect.name_colorized}")}
-        @game_state.enemy.on_effect_expired{|effect| @game_state.logs.add_log("#{effect.name_colorized} on #{@game_state.enemy.name_colorized} has expired")}
-        @game_state.enemy.on_heal{|heal_instance| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} healed #{heal_instance.amount_colorized} HP")}
-        @game_state.enemy.on_dead{ @game_state.logs.add_log("#{@game_state.enemy.name_colorized} is down!")}
-        @game_state.enemy.on_damage_miss{|damage| @game_state.logs.add_log("#{@game_state.enemy.name_colorized} dodged the attack!")}
-        @game_state.enemy.on_creature_make_sound{|sound| @sound.play_sound(sound)}
+        # @param [Damage] damage
+        @game_state.enemy.damageable.on_after_take_damage.subscribe{|damage| 
+            @game_state.logs.add_log("You deal #{damage.amount_colorized} #{damage.damage_type} damage")
+        }
 
-        self.decide_next_enemy_action
-        self.get_turns
+        # @param skill [Skill] the skill that was used
+        @game_state.enemy.skill_usable.on_before_use_skill.subscribe{|skill, target|
+            @game_state.logs.add_log("Enemy use #{skill.name_colorized}")
+        }
+
+        # @param effect [Effect] the effect that was applied
+        @game_state.enemy.effectable.on_after_effect_applied.subscribe{|effect|
+            @game_state.logs.add_log("You inflict #{effect.name_colorized} on Enemy")
+        }
+
+        @game_state.enemy.effectable.on_after_remove_effect.subscribe{|effect|
+            @game_state.logs.add_log("#{effect.name_colorized} on Enemy has expired")
+        }
+
+        @game_state.enemy.healable.on_after_heal.subscribe{|heal_instance|
+            @game_state.logs.add_log("Enemy healed #{heal_instance.amount_colorized} HP")
+        }
+
+        @game_state.enemy.damage_avoid.on_damage_avoided.subscribe{|damage|
+            @game_state.logs.add_log("Enemy dodged the attack!")
+        }
+
+        @game_state.enemy.killable.on_death.subscribe {
+            @game_state.logs.add_log("Enemy is down!")
+            self.go_to_defeat_enemy_menu(@game_state.enemy)
+            @game_state.cleanup_enemy
+            @game_state.player.fightable.end_fight
+        }
+
+        self.trigger_fight(@game_state.enemy)
+    end
+
+    def switch_turn
+        if @game_state.current_turn == nil
+            throw "Cannot switch turn when current turn is nil"
+        end
+
+        @game_state.current_turn.turnable.end_turn
+
+        @game_state.set_current_turn(@game_state.current_turn == @game_state.enemy)
+
+        @game_state.current_turn.turnable.start_turn
+    end
+
+    def start_enemy_turn
+        self.switch_turn
+        
+        while @game_state.current_turn.decide_next_action(@game_state.player) != -1
+            if @game_state.player.killable.is_dead?
+                @menu_manager.change_menu(YouDeadMenu.new(self))
+                return
+            end
+        end
+
+        self.switch_turn
+        @menu_manager.change_menu(PlayMenu.new(self))
     end
 
     def set_use_audio(is_use_audio)
@@ -198,6 +234,29 @@ class Game
         self
     end
 
+    def go_to_map_menu
+        @menu_manager.change_menu(MapMenu.new(self))
+
+        self
+    end
+
+    def go_to_map_pause_menu
+        @menu_manager.change_menu(MapPauseMenu.new(self))
+
+        self
+    end
+
+    # param enemy [Creature] the enemy that the player is fighting
+    def trigger_fight(enemy)
+        @game_state.set_current_turn(true)
+
+        @menu_manager.change_menu(PlayMenu.new(self))
+    end
+
+    def go_to_defeat_enemy_menu(enemy)
+        @menu_manager.change_menu(DefeatEnemyMenu.new(self, enemy))
+    end
+
     def logs
         @game_state.logs.logs
     end
@@ -206,5 +265,33 @@ class Game
         @on_quit_game_listeners.emit()
 
         self
+    end
+
+    def map
+        @game_state.map
+    end
+
+    def input_up
+        @menu_manager.focus_prev_element
+    end
+
+    def input_down
+        @menu_manager.focus_next_element
+    end
+
+    def input_left
+        @menu_manager.select_left_current_element
+    end
+
+    def input_right
+        @menu_manager.select_right_current_element
+    end
+
+    def input_enter
+        @menu_manager.select_current_element
+    end
+
+    def input_escape
+        @menu_manager.escape_menu
     end
 end

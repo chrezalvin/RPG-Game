@@ -1,4 +1,4 @@
-require "Parents/Sound"
+require "Parents/ActionProfile/Sound"
 
 class SelectSound < Sound
     def initialize()

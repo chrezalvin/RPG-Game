@@ -3,17 +3,7 @@ require "forwardable"
 require "utils/Event"
 
 class Mp extend Forwardable
-  attr_reader :current_mp, :max_mp, 
-    :on_mp_used, :on_mp_added, :on_mp_changed,
-    :remove_on_mp_used, :remove_on_mp_added, :remove_on_mp_changed
-
-  def_delegator :@on_mp_used_listeners, :subscribe, :on_mp_used
-  def_delegator :@on_mp_added_listeners, :subscribe, :on_mp_added
-  def_delegator :@on_mp_changed_listeners, :subscribe, :on_mp_changed
-
-  def_delegator :@on_mp_used_listeners, :unsubscribe, :remove_on_mp_used
-  def_delegator :@on_mp_added_listeners, :unsubscribe, :remove_on_mp_added
-  def_delegator :@on_mp_changed_listeners, :unsubscribe, :remove_on_mp_changed
+  attr_reader :current_mp, :max_mp, :on_mp_changed
 
   @@initial_mp = 100
   @@initial_max_mp = 100
@@ -24,33 +14,28 @@ class Mp extend Forwardable
     @current_mp = current_mp || @@initial_mp
     @max_mp = max_mp || @@initial_max_mp
 
-    @on_mp_used_listeners = Event.new()
-    @on_mp_added_listeners = Event.new()
-    @on_mp_changed_listeners = Event.new()
+    @on_mp_changed = Event.new()
   end
 
-  # @param amount [Integer] the amount of mp to add
-  # @return [void]
-  def add_mp(amount)
-    throw "Error: the amount of mp to add is not an integer" unless amount.is_a? Integer
+  protected def modify_mp(value)
+    @current_mp += value
+    @current_mp = @current_mp.clamp(0, @max_mp)
 
-    @on_mp_added_listeners.emit(amount)
-
-    @current_mp = (@current_mp + amount).clamp(0, @max_mp)
-
-    @on_mp_changed_listeners.emit(@current_mp)
+    @on_mp_changed.emit(@current_mp)
   end
 
-  # @param amount [Integer] the amount of mp to use
-  # @return [void]
-  def use_mp(amount)
-    throw "Error: the amount of mp used is not an integer" unless amount.is_a? Integer
+  # @param value [Integer] the amount of mp to be subtracted
+  def -(value)
+    modify_mp(-value)
+  end
 
-    @on_mp_used_listeners.emit(amount)
+  # @param value [Integer] the amount of mp to be added
+  def +(value)
+    modify_mp(value)
+  end
 
-    @current_mp = @current_mp - amount
-
-    @on_mp_changed_listeners.emit(@current_mp)
+  def mp_colorized
+    return "#{@current_mp.to_s.colorize(:cyan)}/#{@max_mp.to_s.colorize(:cyan)}"
   end
 
   # @return [String] the current mp in colorized format

@@ -1,34 +1,50 @@
-require "Parents/Skill"
+require "Parents/Action/Skill"
 require "Damages/SkillDamage"
 
 class MagicArrows < Skill
+  attr_accessor :skill_mp_usage, :damage_multiplier
 
-  @skill_mp_usage = 40
-  @skill_damage_multiplier = 0.5
-  @description = "Cast three arrows made out of magic, each arrow deals #{@skill_damage_multiplier}x of caster's Matk"
-  @name = "Magic Arrows"
   def initialize(skill_owner)
-    super(skill_owner)
-  end
+    super(
+      skill_owner: skill_owner,
+      name: "Magic Arrows",
+      description: "Cast three arrows made out of magic, each arrow deals magic damage based on your matk",
+    )
 
-  def self.skill_damage_multiplier
-    @skill_damage_multiplier
-  end
+    @skill_mp_usage = 20
+    @damage_multiplier = 0.5
 
-  def can_use_skill?(creature)
-    @skill_owner.current_mp >= self.class.skill_mp_usage
+    self.calculate_damage = (@damage_multiplier * @skill_owner.matk.matk_amount).to_i
   end
 
   def use_skill(creature)
-    if super(creature)
-      @skill_owner.use_mp(self.class.skill_mp_usage)
-
-      for i in 1..3
-        damage_amount = (@skill_owner.matk.matk_amount * self.class.skill_damage_multiplier).to_i
-        skillDamage = SkillDamage.new(damage_amount, @skill_owner)
-
-        skillDamage.apply_to(creature)
-      end
+    if !super(creature)
+        return
     end
+
+    use_turn = UseTurn.new(@action_time)
+    use_mp = MpUse.new(@skill_mp_usage)
+
+    @skill_owner.turnable.reduce_turn_amount(use_turn)
+    @skill_owner.mp_usable.use_mp(use_mp)
+
+    for i in 1..3
+      skillDamage = SkillDamage.new(self.calculate_damage, @skill_owner)
+
+      creature.damageable.take_damage(skillDamage)
+    end
+  end
+
+  def can_use_skill?(creature)
+    @skill_owner.mp.current_mp >= @skill_mp_usage && @action_time <= @skill_owner.turns.current_turn
+  end
+
+  def name_display
+    self.skill_display_helper(
+      skill_name: @name,
+      action_time: @action_time,
+      skill_mp_usage: @skill_mp_usage,
+      can_use_skill: can_use_skill?(@skill_owner),
+    )
   end
 end

@@ -1,8 +1,9 @@
 require "colorize"
 require "Parents/Creature"
+require "Parents/Stats/Hp"
 
 class Heal
-    attr_accessor :heal, :heal_type, :is_effect, :healer
+    attr_accessor :heal_type, :is_effect, :healer
 
     # @param heal_amount [Integer] the amount of healing
     # @param healer [Creature, nil] the creature that heals
@@ -17,17 +18,14 @@ class Heal
         @is_effect = is_effect
     end
 
-    def apply_to(creature)
-        throw "Error: creature is not a Creature object" unless creature.is_a? Creature
+    # @return [Integer] the amount of healing
+    def heal
+        heal = @heal
 
-        creature.heal(self)
+        return heal.to_i
     end
 
-    def amount
-        @heal
-    end
-
-    def amount_colorized
+    def heal_colorized
         @heal.to_s.colorize(:green)
     end
 end

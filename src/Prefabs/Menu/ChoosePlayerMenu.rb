@@ -4,6 +4,7 @@ require "Parents/Menu"
 require "Parents/MenuElement"
 
 class ChoosePlayerMenu < Menu
+    # @param game [Game]
     def initialize(game)
         throw "Error: game is not a Game object" unless game.is_a? Game
         super()

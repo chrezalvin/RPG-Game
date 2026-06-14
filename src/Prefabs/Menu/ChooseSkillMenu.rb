@@ -12,33 +12,26 @@ class ChooseSkillMenu < Menu
 
     super()
 
-    @menu_list = game
-      .player
-      .usable_skills
-      .each_with_index
-      .map{
-        |skill, idx| 
-          if skill.can_use_skill?(game.enemy)
-            skill_mp_usage = skill.class.respond_to?(:skill_mp_usage) ? skill.class.skill_mp_usage : nil
-            MenuElement.new(
-              menu_name: "#{skill.name} #{skill_mp_usage != nil ? "(#{skill_mp_usage} MP)".colorize(:light_blue) : ""}", 
-              on_selected: lambda{game.initiate_skill(idx)},
-              tooltip: skill.description
-            )
-          else
-            MenuElement.new(
-              menu_name: "#{skill.name.to_s.colorize(:grey)}", 
-              tooltip: skill.description
-            )
-          end
-        }
-      .push(MenuElement.new(
-        menu_name: "Back", 
-        on_selected: lambda{game.back_to_play_menu}
-      ))
+    @game = game
   end
 
   def menu_list(selected_idx = 0)
-    @menu_list
+    # @type [Creature]
+    player = @game.player
+    player
+      .skills.skills
+      .each_with_index
+      .map{
+        |skill, idx|
+          MenuElement.new(
+            menu_name: "#{skill.name_display}",
+            on_selected: skill.can_use_skill?(@game.enemy) ? lambda{player.skill_usable.use_skill(skill, @game.enemy)} : nil,
+            tooltip: skill.description
+          )
+      }
+      .push(MenuElement.new(
+        menu_name: "Back",
+        on_selected: lambda{@game.back_to_play_menu}
+      ))
   end
 end

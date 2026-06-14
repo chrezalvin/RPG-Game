@@ -19,4 +19,7 @@ class Menu
     def menu_list(selected_idx = 0)
         []
     end
+
+    def on_escape
+    end
 end

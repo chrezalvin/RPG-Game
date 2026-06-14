@@ -25,11 +25,11 @@ class Mage < Creature
             dodge: 5
         )
         @usable_skills = [
-            BasicAttack.new(self),
-            HighHeal.new(self), 
-            BasicHealing.new(self), 
-            MagicMissle.new(self), 
-            MagicArrows.new(self)
+            BasicAttack,
+            HighHeal, 
+            BasicHealing, 
+            MagicMissle, 
+            MagicArrows
         ]
     end
 
@@ -42,7 +42,7 @@ class Mage < Creature
 
         if rand < self.class.chance_to_use_skill
             random_idx = rand(@usable_skills.length)
-            skill = self.skill(random_idx)
+            skill = skills.fetch(random_idx)
             if skill.can_use_skill?(creature)
                 return random_idx
             end

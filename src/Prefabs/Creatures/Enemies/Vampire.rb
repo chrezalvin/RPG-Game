@@ -29,11 +29,11 @@ class Vampire < Creature
         )
 
         @usable_skills = [
-            BasicAttack.new(self),
-            Vampirism.new(self),
-            TransformBat.new(self),
-            RazorClaw.new(self),
-            Sonar.new(self)
+            BasicAttack,
+            Vampirism,
+            TransformBat,
+            RazorClaw,
+            Sonar
         ]
     end
 
@@ -43,6 +43,10 @@ class Vampire < Creature
 
     def decide_next_action(creature)
         super(creature)
+
+        if creature.turns.turn_amount <= 0
+            return -1
+        end
 
         if rand < self.class.chance_to_use_skill
             # prefer sonar if available and vampire is in bat form
@@ -55,7 +59,7 @@ class Vampire < Creature
 
             # otherwise, pick a random skill
             random_idx = rand(@usable_skills.length)
-            if self.skill(random_idx).can_use_skill?(creature)
+            if skills.fetch(random_idx).can_use_skill?(creature)
                 return random_idx
             end
         end

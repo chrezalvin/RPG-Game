@@ -1,37 +1,54 @@
-require "Parents/Skill"
+require "Parents/Action/Skill"
 require "Damages/SkillDamage"
 require "Sounds/SwordSliceSound"
+require "Effects/Art"
+require "Effects/ArmorBreak"
 
 class HeavySwing < Skill
-    @skill_mp_usage = 10
-    @damage_multiplier = 2
-    @description = "A classic heavy swing commonly used by warrior, dealing #{@damage_multiplier}x of caster's Atk"
-    @name = "Heavy Swing"
+    attr_accessor :damage_multiplier, :skill_mp_usage
+
     def initialize(skill_owner)
-        super(skill_owner)
+        super(
+            skill_owner: skill_owner,
+            name: "Heavy Swing",
+            description: "A classic heavy swing commonly used by warrior, applies 1 stack of Armor Break on hit",
+        )
+
+        @skill_mp_usage = 20
+        @damage_multiplier = 3
     end
 
-    def self.skill_mp_usage
-        @skill_mp_usage
-    end
-
-    def self.damage_multiplier
-        @damage_multiplier
-    end
-
-    def can_use_skill?(creature)
-        @skill_owner.current_mp >= self.class.skill_mp_usage
+    def calculate_damage
+        (@damage_multiplier * @skill_owner.atk.atk).to_i
     end
 
     def use_skill(creature)
-        if super(creature)
-            @skill_owner.use_mp(self.class.skill_mp_usage)
-
-            damage_amount = (self.class.damage_multiplier * @skill_owner.atk.atk_amount).to_i
-            skillDamage = SkillDamage.new(damage_amount, @skill_owner)
-
-            # @skill_owner.make_sound(SwordSliceSound.new())
-            skillDamage.apply_to(creature)
+        if !super(creature)
+            return
         end
+
+        use_mp = MpUse.new(@skill_mp_usage)
+        use_turn = UseTurn.new(@action_time)
+
+        @skill_owner.mp_usable.use_mp(use_mp)
+        @skill_owner.turnable.reduce_turn_amount(use_turn)
+
+        skillDamage = SkillDamage.new(self.calculate_damage, @skill_owner)
+        skillDamage.has_effects = [ArmorBreak.new()]
+
+        creature.damageable.take_damage(skillDamage)
+    end
+
+    def name_display
+        self.skill_display_helper(
+            skill_name: @name,
+            action_time: @action_time,
+            skill_mp_usage: @skill_mp_usage,
+            can_use_skill: can_use_skill?(@skill_owner),
+        )
+    end
+
+    def can_use_skill?(_)
+        @skill_owner.mp.current_mp <= @skill_mp_usage && @action_time <= @skill_owner.turns.current_turn
     end
 end

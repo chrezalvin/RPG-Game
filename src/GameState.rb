@@ -5,12 +5,15 @@ require "Data/UserData"
 
 require "Parents/Creature"
 require "Parents/Menu"
+require "Parents/Stats/Turn"
 
 require "Creatures/Enemies/Minotaur"
 require "Menu/MainMenu"
+require "Prefabs/MapLevel/MapLevelDefault"
+require "Prefabs/MapInstances/PlayerMapInstance"
 
 class GameState extend Forwardable
-    attr_reader :player, :enemy, :current_menu, :logs, :inspecting,
+    attr_reader :player, :enemy, :current_menu, :logs, :inspecting, :current_turn, :map, :player_map_instance,
         :volume, :is_use_audio
 
     def_delegator :@game_settings, :preferred_volume, :volume
@@ -22,12 +25,22 @@ class GameState extend Forwardable
         
         # @type [Creature]
         @player = nil
+
+        # @type [PlayerMapInstance]
+        @player_map_instance = nil
         
         # @type [Creature]
         @enemy = nil
 
         # @type [Creature]
         @inspecting = nil
+
+        # @type [Creature, nil]
+        @current_turn = nil
+
+        # @type [Map]
+        @map = nil
+
         @logs = Logs.new()
     end
 
@@ -41,6 +54,7 @@ class GameState extend Forwardable
 
     def set_enemy(enemy)
         if enemy.is_a? Creature
+            @is_exploring = false
             @enemy = enemy
 
             @logs.add_log("A #{@enemy.name_colorized} challenged you to a duel!")
@@ -49,9 +63,17 @@ class GameState extend Forwardable
         self
     end
 
+    def cleanup_enemy()
+        @enemy = nil
+        @is_exploring = true
+    end
+
     def set_player(player)
         if player.is_a? Creature
             @player = player
+            @map = MapLevelDefault.new()
+            @player_map_instance = PlayerMapInstance.new(player)
+            @map.add_instance(@player_map_instance)
 
             @logs.add_log("You choose #{player.name_colorized}")
         end
@@ -69,6 +91,23 @@ class GameState extend Forwardable
         @inspecting = nil
     end
 
+    # @param from [Creature] the creature whose turns are being calculated
+    # @param against [Creature] the creature against which the turns are being calculated
+    protected def get_turns(from, against)
+        from.speed.calculate_turns(against)
+    end
+
+    def set_current_turn(is_player)
+        if is_player
+            @current_turn = @player
+        else
+            @current_turn = @enemy
+        end
+
+        @current_turn.turns.set_turn(0)
+        @current_turn.turns + get_turns(@current_turn, is_player ? @enemy : @player)
+    end
+
     def set_audio(volume)
         @game_settings.set_preferred_volume(volume)
         @volume = volume
@@ -82,6 +121,10 @@ class GameState extend Forwardable
     def reset_state
         @player = nil
         @enemy = nil
+        @inspecting = nil
+        @player_map_instance = nil
+        @current_turn = nil
+        @map = nil
         @logs.reset_logs
     end
 end
