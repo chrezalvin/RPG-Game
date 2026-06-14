@@ -246,7 +246,7 @@ class Art < Effect
             use_turn = UseTurn.new(action_time)
             @skill_owner.turnable.reduce_turn_amount(use_turn)
 
-            damage = self.calculate_damage(creature)
+            damage = self.calculate_damage
             skillDamage = SkillDamage.new(damage, @skill_owner)
             skillDamage.has_effects = [ArmorBreak.new()]
 
