@@ -5,9 +5,13 @@ require "Skills/BasicAttack"
 require "Skills/BasicHealing"
 require "Skills/Guard"
 require "Skills/Parry"
+require "Skills/Quicken"
 require "Effects/Thorns"
+require "Effects/Art"
 
 class Viking < Creature
+    attr_accessor :arts
+
     @description = "An ancient warrior"
     @name = "Viking"
     @chance_to_use_skill = 0.5
@@ -25,14 +29,25 @@ class Viking < Creature
             speed: 5
         )
 
-        @effects = []
-        @usable_skills = [
-            BasicAttack.new(self),
-            HeavySwing.new(self), 
-            BasicHealing.new(self),
-            Guard.new(self),
-            Parry.new(self)
+        @skills.skills = [
+            BasicAttack,
+            HeavySwing, 
+            Guard,
+            Parry,
+            BasicHealing,
+            Quicken
         ]
+        
+        @art = Art.new(0)
+        @fightable.on_before_fight_start_listeners.subscribe{|_|
+            # gain Art buff at the start of fight
+            @effectable.apply_effect(@art)
+        }
+
+        @fightable.on_after_fight_end_listeners.subscribe{|_|
+            # remove all Art stacks at the end of fight
+            @effectable.remove_effect(@art)
+        }
     end
 
     def self.chance_to_use_skill
@@ -44,7 +59,7 @@ class Viking < Creature
 
         if rand < self.class.chance_to_use_skill
             random_idx = rand(@usable_skills.length)
-            skill = self.skill(random_idx)
+            skill = skills.fetch(random_idx)
             if skill.can_use_skill?(creature)
                 return random_idx
             end

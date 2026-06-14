@@ -19,14 +19,16 @@ if __FILE__ == $0
     user_input = UserInput.new()
     flag_exit = false
 
-    user_input.on_up{game.menu_manager.focus_prev_element}
-    user_input.on_down{game.menu_manager.focus_next_element}
+    user_input.on_up{game.input_up}
+    user_input.on_down{game.input_down}
 
-    user_input.on_enter{game.menu_manager.select_current_element}
-    user_input.on_space{game.menu_manager.select_current_element}
+    user_input.on_enter{game.input_enter}
+    user_input.on_space{game.input_enter}
 
-    user_input.on_right{game.menu_manager.select_right_current_element}
-    user_input.on_left{game.menu_manager.select_left_current_element}
+    user_input.on_right{game.input_right}
+    user_input.on_left{game.input_left}
+
+    user_input.on_esc{game.input_escape}
 
     game.on_quit_game{flag_exit = true}
 

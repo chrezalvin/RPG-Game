@@ -1,38 +1,43 @@
-require "Parents/Effect"
+require "Parents/Action/Effect"
 
 class ArmorBreak < Effect
-    @def_reduction_multiplier_percentage = 50
-    @name = "Armor Break"
-    @description = "Reduces defense by #{@def_reduction_multiplier_percentage}%"
-    def initialize(stack = 1)
-        super()
-        @stack = stack
+    attr_accessor :def_reduction_multiplier_percentage
+
+    def initialize()
+        super(
+            name: "Armor Break",
+            description: "Reduces next attack's damage by 50%, removed after turn ends",
+        )
+
+        @def_reduction_multiplier_percentage = 50
     end
 
-    def self.def_reduction_multiplier_percentage
-        @def_reduction_multiplier_percentage
+    def display_name
+        @name
     end
 
-    # @param defense [Defense] 
-    def modify_defense(defense)
-        super(defense)
-        defense.defense = (defense.defense * (self.class.def_reduction_multiplier_percentage) / 100).to_i
+    def short_display_name
+        "AB"
     end
 
-    # @param creature [Creature] the creature to apply the effect to
-    def apply_effect(creature)
-        throw "creature must be an instance of Creature, got #{creature.class}" unless creature.is_a? Creature
+    def on_attach(creature)
+        super(creature)
 
-        effect = creature.find_effect(self.class)
-
-        if effect == nil
-            self.apply_effect(creature)
-        else
-            effect.add_stack(self.stack)
-        end
+        creature.defense.defense_modifiers << method(:modify_defense)
+        creature.turnable.on_before_turn_end.subscribe(method(:on_turn_ends))
     end
 
-    def is_expired?
-        @stack <= 0
+    def on_detach(creature)
+        creature.defense.defense_modifiers.delete(method(:modify_defense))
+        creature.turnable.on_before_turn_end.unsubscribe(method(:on_turn_ends))
+    end
+
+    # @param defense_amount [Integer] the defense amount to be modified
+    def modify_defense(defense_amount)
+        return (defense_amount * (100 - @def_reduction_multiplier_percentage) / 100).to_i
+    end
+
+    def on_turn_ends
+        @effect_owner.effectable.remove_effect(self)
     end
 end

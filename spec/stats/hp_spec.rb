@@ -1,6 +1,6 @@
 require "Parents/Stats/Hp"
-require "Parents/Damage"
-require "Parents/Heal"
+require "Parents/ActionProfile/Damage"
+require "Parents/ActionProfile/Heal"
 
 RSpec.describe Hp do
     context "when initialized with current hp 50 and max hp 100" do

@@ -12,24 +12,20 @@ class InspectSkillMenu < Menu
 
     super()
     @menu_banner = "Inspecting #{game.inspecting.name_colorized}'s Skills"
-    @menu_list = game
-      .inspecting
-      .usable_skills
+
+    # @type [Creature]
+    inspecting = game.inspecting
+
+    @menu_list = inspecting
+      .skills
+      .skills
       .each_with_index
       .map{
         |skill, idx| 
-          skill_mp_usage = skill.class.respond_to?(:skill_mp_usage) ? skill.class.skill_mp_usage : nil
-          if skill.can_use_skill?(game.enemy)
-            MenuElement.new(
-              menu_name: "#{skill.name} #{skill_mp_usage != nil ? "(#{skill_mp_usage} MP)".colorize(:light_blue) : ""}",
-              tooltip: skill.description
-            )
-          else
-            MenuElement.new(
-              menu_name: "#{skill.name.to_s} #{skill_mp_usage != nil ? "(#{skill_mp_usage} MP)" : ""}".colorize(:grey), 
-              tooltip: skill.description
-            )
-          end
+          MenuElement.new(
+            menu_name: "#{skill.name}",
+            tooltip: skill.description
+          )
         }
       .push(MenuElement.new(
         menu_name: "Back", 

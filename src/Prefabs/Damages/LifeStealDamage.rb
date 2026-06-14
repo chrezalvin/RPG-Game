@@ -1,4 +1,4 @@
-require "Parents/Damage"
+require "Parents/ActionProfile/Damage"
 require "Heal/BasicHeal"
 
 class LifeStealDamage < Damage
@@ -8,7 +8,7 @@ class LifeStealDamage < Damage
         damage_type: nil,
         lifesteal_percentage: 0
     )
-        super(amount, damage_dealer, false)
+        super(amount, damage_dealer)
         @damage_type = damage_type
         @lifesteal_percentage = lifesteal_percentage
     end

@@ -1,47 +1,52 @@
-require "Parents/Effect"
+require "Parents/Action/Effect"
 
 require "Damages/EffectDamage"
 
 class Parrying < Effect
-    @damage_reduction_multiplier_percentage = 50
-    @name = "Parrying"
-    @description = "Reduces the next damage taken by #{@damage_reduction_multiplier_percentage}% then attacks back using basic attack"
-    def initialize(stack = 1)
-        super()
-        @stack = stack
+    attr_accessor :damage_reduction_multiplier_percentage, 
+        :attack_multiplier_percentage    
+
+    def initialize()
+        super(
+            name: "Parrying",
+            description: "Reduces next damage taken by half then attacks back, removed after parrying or after you use any skill"
+        )
+
+        @damage_reduction_multiplier_percentage = 50
+        @attack_multiplier_percentage = 100
     end
 
-    def self.damage_reduction_multiplier_percentage
-        @damage_reduction_multiplier_percentage
+    def short_display_name
+        "Pa"
+    end
+
+    def calculate_damage
+        (@effect_owner.atk.atk * @attack_multiplier_percentage / 100).to_i
+    end
+
+    def on_attach(creature)
+        super(creature)
+
+        creature.damageable.on_before_take_damage.subscribe(method(:on_before_take_damage))
+        creature.skill_usable.on_before_use_skill.subscribe(method(:on_before_use_skill))
+    end
+
+    def on_detach(creature)
+        creature.damageable.on_before_take_damage.unsubscribe(method(:on_before_take_damage))
+        creature.skill_usable.on_before_use_skill.unsubscribe(method(:on_before_use_skill))
     end
 
     # @param damage [Damage] the damage instance to be modified
     def on_before_take_damage(damage)
-        super(damage)
+        damage.damage = (damage.damage * (100 - @damage_reduction_multiplier_percentage) / 100).to_i
 
-        damage.damage = (damage.damage * (100 - self.class.damage_reduction_multiplier_percentage) / 100).to_i
-        
-        @stack -= 1
-        
-        if self.is_expired?
-            @effect_owner.cleanup_expired_effects
-        end
+        parry_damage = EffectDamage.new(self.calculate_damage)
+        damage.damage_dealer.damageable.take_damage(parry_damage)
 
-        @effect_owner.use_skill(0, damage.damage_dealer)
+        @effect_owner.effectable.remove_effect(self)
     end
 
-    def apply_effect(creature)
-        found = creature.find_effect(self.class)
-
-        if found.nil?
-            creature.apply_effect(self)
-            @effect_owner = creature
-        else
-            found.add_stack(@stack)
-        end
-    end
-
-    def is_expired?
-        @stack <= 0
+    def on_before_use_skill(skill, target)
+        @effect_owner.effectable.remove_effect(self)
     end
 end

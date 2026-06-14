@@ -16,7 +16,9 @@ class MenuElement
             on_hover: nil,
             on_selected: nil,
             on_select_right: nil,
-            on_select_left: nil
+            on_select_left: nil,
+            on_select_next: nil,
+            on_select_prev: nil
         )
 
         @menu_name = menu_name
@@ -24,6 +26,8 @@ class MenuElement
         @on_hover = on_hover
         @on_select_right = on_select_right
         @on_select_left = on_select_left
+        @on_select_next = on_select_next
+        @on_select_prev = on_select_prev
         @tooltip = tooltip
     end
 
@@ -56,6 +60,22 @@ class MenuElement
         return false unless @on_select_left&.respond_to?("call")
         
         @on_select_left.call
+
+        return true
+    end
+
+    def select_next_menu_element
+        return false unless @on_select_next&.respond_to?("call")
+        
+        @on_select_next.call
+
+        return true
+    end
+
+    def select_prev_menu_element
+        return false unless @on_select_prev&.respond_to?("call")
+        
+        @on_select_prev.call
 
         return true
     end

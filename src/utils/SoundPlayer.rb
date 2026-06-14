@@ -1,6 +1,6 @@
 require "gosu"
 
-require "Parents/Sound"
+require "Parents/ActionProfile/Sound"
 require "GameState"
 
 class SoundPlayer < Gosu::Window

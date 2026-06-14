@@ -1,34 +1,47 @@
 require "colorize"
 require "Parents/Creature"
+require "Parents/Stats/Hp"
 
 class Damage
-    attr_accessor :damage, :damage_type, :is_effect, :damage_dealer, :has_effects
+    attr_accessor :damage, 
+                :damage_type, 
+                :is_effect, 
+                :damage_dealer, 
+                :has_effects, 
+                :is_miss, 
+                :piercing
 
     # @param damage_amount [Integer] the amount of damage
-    # @param damage_dealer [Creature, nil] the creature that deals the damage
-    # @param is_effect [Boolean] whether the damage is caused by an effect
-    def initialize(damage_amount, damage_dealer, is_effect = true)
+    # @param damage_dealer [Creature] the creature that deals the damage
+    def initialize(damage_amount, damage_dealer)
         throw "Error: damage_amount must be an Integer, got #{damage_amount.class}" unless damage_amount.is_a? Integer
         throw "Error: damage_dealer must be a Creature or nil, got #{damage_dealer.class}" unless damage_dealer.is_a?(Creature) || damage_dealer == nil
 
         @damage = damage_amount
         @damage_dealer = damage_dealer
+
+        # @type [String] the type of damage
         @damage_type = "unknown"
+        # @type [Boolean] whether this damage is caused by an effect or not.
         @is_effect = is_effect
+        # @type [Boolean] whether this damage is a miss or not
+        @is_miss = false
+        # @type [Integer] the piercing percentage value of this damage
+        @piercing = 0
 
         # @type [Array<Effect>] the effects that cause this damage, if applicable
         @has_effects = []
     end
 
-    # @param creature [Creature] the creature to apply the damage to
-    def apply_to(creature)
-        throw "Error: creature is not a Creature object" unless creature.is_a? Creature
+    # @return [Integer] the amount of damage
+    def damage
+        damage = @damage
 
-        creature.take_damage(self)
+        return damage.to_i
     end
 
     def accuracy
-        @damage_dealer&.accuracy.accuracy || 0
+        @damage_dealer.acc.accuracy
     end
 
     # @return [String] the colorized string representation of the damage amount

@@ -15,13 +15,14 @@ class InspectEffectMenu < Menu
     @menu_list = game
       .inspecting
       .effects
+      .effects
       .each_with_index
       .map{
         |effect, idx|
             # @type [Effect]
             my_effect = effect
             MenuElement.new(
-                menu_name: "#{my_effect.name} (#{my_effect.stack})",
+                menu_name: my_effect.display_name,
                 tooltip: my_effect.description
             )
         }

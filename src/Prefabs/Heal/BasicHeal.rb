@@ -1,4 +1,4 @@
-require "Parents/Heal"
+require "Parents/ActionProfile/Heal"
 
 class BasicHeal < Heal
     def initialize(heal_amount, healer)

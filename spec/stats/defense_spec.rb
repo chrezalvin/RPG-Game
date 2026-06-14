@@ -1,5 +1,5 @@
 require "Parents/Stats/Defense"
-require "Parents/Damage"
+require "Parents/ActionProfile/Damage"
 
 RSpec.describe Defense do
   context "when initialized with defense 5" do

@@ -20,8 +20,8 @@ class GiantSpider < Creature
         )
 
         @usable_skills = [
-            BasicAttack.new(self), 
-            AcrobaticSlash.new(self)
+            BasicAttack, 
+            AcrobaticSlash
         ]
     end
 
@@ -32,9 +32,13 @@ class GiantSpider < Creature
     def decide_next_action(creature)
         super(creature)
 
+        if creature.turns.turn_amount <= 0
+            return -1
+        end
+
         if rand < self.class.chance_to_use_skill
             random_idx = rand(@usable_skills.length)
-            skill = self.skill(random_idx)
+            skill = skills.fetch(random_idx)
             if skill.can_use_skill?(creature)
                 return random_idx
             end

@@ -1,4 +1,5 @@
 require "Parents/Creature"
+require "Parents/Actionable/SkillUsable"
 
 require "Skills/BasicAttack"
 require "Skills/HeavySwing"
@@ -20,10 +21,13 @@ class Minotaur < Creature
             speed: 5
         )
 
-        @usable_skills = [
-            BasicAttack.new(self), 
-            HeavySwing.new(self)
-        ]
+        @skills = Skills.new(
+            [
+                BasicAttack,
+                HeavySwing
+            ],
+            self
+        )
     end
 
     def self.chance_to_use_skill
@@ -31,16 +35,21 @@ class Minotaur < Creature
     end
 
     def decide_next_action(creature)
-        super(creature)
-
-        if rand < self.class.chance_to_use_skill
-            random_idx = rand(@usable_skills.length)
-            skill = self.skill(random_idx)
-            if skill.can_use_skill?(creature)
-                return random_idx
-            end
+        # super(creature)
+        
+        if self.turns.current_turn <= 0
+            return -1
         end
-
-        return 0
+        
+        skills = self.skills.skills
+        random_idx = rand(skills.length)
+        if rand < self.class.chance_to_use_skill
+            skill = skills.fetch(random_idx)
+            if skill.can_use_skill?(creature)
+                self.skill_usable.use_skill(skill, creature)
+            end
+        else
+            self.skill_usable.use_skill(skills[0], creature)
+        end
     end
 end

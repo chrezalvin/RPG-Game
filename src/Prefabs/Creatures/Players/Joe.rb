@@ -9,11 +9,19 @@ class Joe < Creature
     @name = "Joe"
     @chance_to_use_skill = 0.5
     def initialize()
-        super(atk: 10, matk: 10, hp: 100, mp: 100, nmpr: 10, nhpr: 10)
+        super(
+            atk: 10, 
+            matk: 10, 
+            hp: 100, 
+            mp: 100, 
+            nmpr: 10, 
+            nhpr: 10
+        )
+
         @usable_skills = [
-            BasicAttack.new(self),
-            Vampirism.new(self),
-            TransformBat.new(self)
+            BasicAttack,
+            Vampirism,
+            TransformBat
         ]
     end
 
@@ -26,7 +34,7 @@ class Joe < Creature
 
         if rand < self.class.chance_to_use_skill
             random_idx = rand(@usable_skills.length)
-            skill = self.skill(random_idx)
+            skill = skills.fetch(random_idx)
             if skill.can_use_skill?(creature)
                 return random_idx
             end

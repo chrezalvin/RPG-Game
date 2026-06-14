@@ -27,7 +27,6 @@ class MenuManager extend Forwardable
         @selected_idx = @@default_selected_idx
         @current_menu = initial_menu
 
-
         @on_focus_next_element = Event.new
         @on_focus_prev_element = Event.new
         @on_select_current_element = Event.new
@@ -53,11 +52,14 @@ class MenuManager extend Forwardable
         @current_menu
             .menu_list(@selected_idx)
             .each_with_index
-            .map{|menu_element, idx| idx == @selected_idx ? "> #{menu_element.menu_name}" : "  #{menu_element.menu_name}"}
+            .map do |menu_element, idx| 
+                idx == @selected_idx ? "> #{menu_element.menu_name}" : "  #{menu_element.menu_name}"
+            end
     end
 
     # @return [void]
     def focus_next_element
+        @current_menu.menu_list[@selected_idx].select_next_menu_element
         @selected_idx = (@selected_idx + 1) % (@current_menu.menu_list.length)
         @on_focus_next_element.emit
 
@@ -66,6 +68,7 @@ class MenuManager extend Forwardable
 
     # @return [void]
     def focus_prev_element
+        @current_menu.menu_list[@selected_idx].select_prev_menu_element
         @selected_idx = (@selected_idx - 1) % (@current_menu.menu_list.length)
         @on_focus_prev_element.emit
 
@@ -112,5 +115,9 @@ class MenuManager extend Forwardable
             @current_menu.menu_list[@selected_idx]
         else nil
         end
+    end
+
+    def escape_menu
+        @current_menu.on_escape
     end
 end

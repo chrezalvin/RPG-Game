@@ -6,12 +6,12 @@ require_relative "./Vampire"
 
 class EnemiesList
     @@enemies_list = [
-            Minotaur,
-            NovaTheCat,
-            GiantSpider,
-            Mummy,
-            Vampire,
-        ]
+        Minotaur,
+        NovaTheCat,
+        GiantSpider,
+        Mummy,
+        Vampire,
+    ]
 
     def self.get_enemies_list
         @@enemies_list

@@ -1,6 +1,8 @@
 class Logs
     def initialize(initial_length = 10)
         @logs_length = initial_length
+
+        # @type [Array<String>]
         @logs = Array.new(@logs_length, "")
     end
 

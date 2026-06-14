@@ -1,5 +1,5 @@
 require "Parents/Stats/Dodge"
-require "Parents/Damage"
+require "Parents/ActionProfile/Damage"
 require "Parents/Creature"
 
 RSpec.describe Dodge do

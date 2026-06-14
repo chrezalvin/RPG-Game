@@ -1,47 +1,44 @@
-require "Parents/Effect"
+require "Parents/Action/Effect"
 
 require "Damages/EffectDamage"
 
 class Thorns < Effect
-    @damage_fraction_multiplier_percentage = 25
-    @initial_durability = 3
-    @name = "Thorns"
-    @description = "Deals #{@damage_fraction_multiplier_percentage}% damage to the attacker back when the bearer takes damage for #{@initial_durability} times"
     def initialize()
-        super()
-        @durability = self.class.initial_durability
+        super(
+            name: "Thorns",
+            description: "Deals 25% damage to the attacker back when the bearer takes damage"
+        )
+
+        @durability = 3
+        @damage_fraction_multiplier_percentage = 25
     end
 
-    def self.damage_fraction_multiplier_percentage
-        @damage_fraction_multiplier_percentage
+    def short_display_name
+        "Th(#{@durability})"
     end
-    
-    def self.initial_durability
-        @initial_durability
+
+    def on_attach(creature)
+        super(creature)
+
+        creature.damageable.on_after_take_damage.subscribe(method(:on_after_take_damage))
+    end
+
+    def on_detach(creature)
+        creature.damageable.on_after_take_damage.unsubscribe(method(:on_after_take_damage))
     end
 
     def on_after_take_damage(damage)
-        super(damage)
-        if damage.damage_dealer != nil
-            effectDamage = EffectDamage.new((damage.damage * self.class.damage_fraction_multiplier_percentage / 100).to_i)
-            damage.damage_dealer.take_damage(effectDamage)
+        if damage.damage_dealer == nil
+            return
         end
 
-        @effect_owner.cleanup_expired_effects
-    end
+        effectDamage = EffectDamage.new((damage.damage * @damage_fraction_multiplier_percentage / 100).to_i, @effect_owner)
+        damage.damage_dealer.take_damage(effectDamage)
 
-    def apply_effect(creature)
-        found = creature.find_effect(self.class)
+        @durability -= 1
 
-        if found.nil?
-            creature.apply_effect(self)
-            @effect_owner = creature
-        else
-            found.add_stack(@stack)
+        if @durability <= 0
+            @effect_owner.effectable.remove_effect(self)
         end
-    end
-
-    def is_expired?
-        @durability <= 0
     end
 end

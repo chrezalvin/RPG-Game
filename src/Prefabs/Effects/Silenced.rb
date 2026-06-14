@@ -1,44 +1,49 @@
-require "Parents/Effect"
+require "Parents/Action/Effect"
 
 class Silenced < Effect
-    @matk_reduction_multiplier_percentage = 50
-    @name = "Silenced"
-    @description = "Reduces the next MATK by #{@matk_reduction_multiplier_percentage}%"
+    attr_reader :stack
+    
     def initialize(stack = 1)
-        super()
+        super(
+            name: "Silenced",
+            description: "Reduces the next MATK by 50%, -1 stack for each turn"
+        )
+
         @stack = stack
+        @matk_reduction_multiplier_percentage = 50
     end
 
-    def self.matk_reduction_multiplier_percentage
-        @matk_reduction_multiplier_percentage
+    def short_display_name
+        "Si(#{@stack})"
+    end
+
+    def on_attach(creature)
+        super(creature)
+        
+        creature.matk.matk_modifiers.push(method(:modify_matk))
+        creature.turnable.on_before_turn_end.subscribe(method(:on_turn_ends))
+    end
+
+    def on_update(silenced)
+        throw "effect must be an instance of Silenced, got #{silenced.class}" unless silenced.is_a? Silenced
+
+        @stack += silenced.stack
+    end
+
+    def on_detach(creature)
+        creature.matk.matk_modifiers.delete(method(:modify_matk))
+        creature.turnable.on_before_turn_end.unsubscribe(method(:on_turn_ends))
     end
 
     def modify_matk(matk)
-        super(matk)
+        (matk.matk_amount * (100 - @matk_reduction_multiplier_percentage) / 100).to_i
+    end
 
-        matk.matk_amount = (matk.matk_amount * (100 - self.class.matk_reduction_multiplier_percentage) / 100).to_i
-
+    def on_turn_ends
         @stack -= 1
-        @effect_owner.cleanup_expired_effects if self.is_expired?
-    end
 
-    def apply_effect(creature)
-        throw "creature must be an instance of Creature, got #{creature.class}" unless creature.is_a? Creature
-
-        # find if the creature already has this effect
-        existing_effect = creature.find_effect(self.class)
-
-        if existing_effect
-            # if the creature already has this effect, refresh the effect
-            existing_effect.add_stack(@stack)
-        else
-            # if the creature does not have this effect, apply the effect as normal
-            creature.apply_effect(self)
-            @effect_owner = creature
+        if @stack <= 0
+            @effect_owner.effectable.remove_effect(self)
         end
-    end
-
-    def is_expired?
-        @stack <= 0
     end
 end

@@ -39,7 +39,7 @@ class UserInput extend Forwardable
             @listen_left.emit()
         elsif user_input.bytes == [32]
             @listen_space.emit()
-        elsif user_input.bytes == [224, 83]
+        elsif user_input.bytes == [27]
             @listen_esc.emit()
         end
     end
